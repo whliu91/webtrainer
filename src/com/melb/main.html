@@ -24,18 +24,21 @@
 <script>
 function openNav() {
     document.getElementById("mySidenav").style.width = "250px";
+	document.getElementById("main").style.marginLeft = "250px";
 }
 
 function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
+	document.getElementById("main").style.marginLeft = "0";
 }
 </script>
 	
-	<article>
+	<div id="main">
+	
 	<h1>nimated Sidenav Example</h1>
 	<p>Click on the element below to open the side navigation menu.</p>
 	
-	</article>
+	</div>
 	
 </body>
 
