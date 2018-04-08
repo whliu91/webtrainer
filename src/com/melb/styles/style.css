@@ -1,0 +1,85 @@
+/*filename:style.css
+ author:Ziyi Wang
+ created:08/04/2018
+ last modifies:
+ description:all html files
+ */
+
+* {font-family: calibri;} 
+
+body {background-image: url("images/background.jpg");
+	background-repeat: repeat;
+    margin: 0;
+}
+
+header h1 {color:purple; 
+		font-size: 4em; 
+		font-weight: bold;
+		text-align: center; 
+		font-family: calibri,ebrima,arial;}
+		
+
+nav a {text-decoration: none;
+		color: #6600cc;
+		padding: 0.2em 0.6em;
+		background-color: #ccc;
+		text-align: left;
+		margin-left: 100px;}
+		
+nav {text-align: center;}
+
+aside, footer {font-style: italic;}
+
+#presentation1 {float: left; width:40%; text-align: center;}
+
+#presentation2 {float: left; width:40%; text-align: center;}
+
+#presentation3 {float: left; width:20%; text-align: center;}
+
+#otherformats {float: left; width:100%;}
+
+#relatedtech {float: left; width:100%;}
+
+.special {font-weight: bold; font-size: 1.5em;}
+
+a:hover {background-color: #6699ff;
+		color: white;}		
+
+h2 {color:#0000cc; font-size: 2em; font-weight:bold;}
+
+h3 {color:#6666ff; font-size: 1.8em; font-weight:bold;}
+
+h4 {color:#b3b3ff; font-size: 1.5em; font-weight:bold;}
+
+table, thead, td, th{border: 1px solid black;}
+
+thead {background-color: #ff0080; color: white;}
+
+tbody {background-color: #ff99cc;}
+
+aside {border: 4px double #cc33ff;
+		border-radius: 14px;
+		margin: 1em;
+		padding: 1em;
+		background: url(images/fade.jpg) repeat-x top left;
+		width: 25%;
+		float: right;}
+
+#content {border: 4px dotted #6699ff;
+		border-radius: 14px;
+		margin: 1em;
+		padding: 1em;
+		background: url(images/fade.jpg) repeat-x top left;
+		width: 30%;}
+
+#relatedtech ul li {list-style-type:square;}
+
+footer {border-top: 4px double darkgray;
+		clear: both;
+		text-align: center;
+		font-size: 0.8em;
+		}		
+		
+
+
+

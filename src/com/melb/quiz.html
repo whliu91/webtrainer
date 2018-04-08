@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="description" content="Quiz about MathML" />
+  <meta name="keywords" content="HTML, MathML, Quiz" />
+  <meta name="author" content="A Student"  />
+  <link href="styles/style.css" rel="stylesheet"/>
+  <title>Quiz</title>
+</head>
+
+<body>
+	<header>
+		<h1>Information system center</h1>
+	</header>
+	<nav>
+			<a href="index.html">Homepage</a>
+			<a href="topic.html">MathML</a>
+			<a href="quiz.html">Quiz</a>
+			<a href="enhancements.html">Enhancements</a>
+	</nav>
+	
+	
+	<form method="post" action="http://mercury.ict.swin.edu.au/it000000/formtest.php">
+
+		<fieldset>
+			<legend>Paticipants details</legend>
+			<p><label for="firstname">First name</label>
+				<input type="text" name="firstname" id="firstname" pattern="[a-zA-Z/-]{1,20}" required="required" />
+			</p>
+			<p><label for="lastname">Last name</label>
+				<input type="text" name="lastname" id="lastname" pattern="[a-zA-Z/-]{1,20}" required="required" />
+			</p>
+			<p><label for="studentnumber">Student number</label>
+				<input type="text" name="studentnumber" id="studentnumber" pattern="[0-9]{7}|[0-9]{10}" required="required" />
+			</p>
+		</fieldset>
+		
+		<fieldset>
+			<legend>Question 1</legend>
+			<p>What is the full-name of MathML?</p>
+			<p><label for="inputanswer"></label>
+			<input type="text" name="inputanswer" id="inputanswer" pattern="[a-zA-Z/-]{1,20}" required="required" />
+			</p>
+		</fieldset>
+		
+		<fieldset>
+			<legend>Question 2</legend>
+			<p>Which one is still under development?</p>
+			<p><label><input type="radio" id="presentation" name="preseatation" value="presentation" checked="checked" />Presentation MathML</label>
+			</p>
+			<p><label><input type="radio" id="contents" name="preseatation" value="contents" />Content MathML</label>
+			</p>
+			<p><label><input type="radio" id="supported" name="preseatation" value="supported" />Supported MathML</label>
+			</p>
+		</fieldset>
+		
+		<fieldset>
+			<legend>Question 3</legend>
+			<p>Which are used for roots?</p>
+			<p><label for="mo">mo</label> 
+			<input type="checkbox" id="mo" name="roots[]" value="mo" checked="checked"/>
+			
+			<label for="msqrt">msqrt</label> 
+			<input type="checkbox" id="msqrt" name="roots[]" value="msqrt"/>
+			
+			<label for="mi">mi</label> 
+			<input type="checkbox" id="mi" name="roots[]" value="mi"/>
+			
+			<label for="mfenced">mfenced</label> 
+			<input type="checkbox" id="mfenced" name="roots[]" value="mfenced"/>
+			
+			<label for="mroot">mroot</label> 
+			<input type="checkbox" id="mroot" name="roots[]" value="mroot"/>
+			</p>
+		</fieldset>
+		
+		<fieldset>
+			<legend>Question 4</legend>
+			<p>What is this format for quadratic formula?</p>
+			<a href="table2.jpg"><img src="images/table2.jpg" alt="format2" /></a>
+			<p><label for="format">Answer</label> 
+			<select name="format" id="format">
+				<option value="">Please Select</option>	
+				<option value="latex">LaTeX</option>			
+				<option value="troff/eqn">troff/eqn</option>
+				<option value="libreoffice">LibreOffice Math</option>
+				<option value="ascii">AsciiMath</option>
+				<option value="none">None</option>
+			</select>
+			</p>
+
+		</fieldset>
+		
+		
+		<fieldset>
+			<legend>Question 5</legend>
+			<p>What are the related technologies?</p>
+			<p><label for="related">Description of Issue<br />
+			<textarea id="related" name="related" rows="4" cols="40" placeholder="Please enter the answer here..."  required="required"></textarea></label>
+			</p>
+		</fieldset>	
+
+	<input type= "submit" value="Submit"/>
+	<input type= "reset" value="Reset Form"/>
+	</form>	
+	<footer>
+	<p class="email"> Mark up by: <a href="mailto:101051258@student.swin.edu.au" title= "This takes you to student email">ziyi wang</a></p>
+	</footer>
+</body>
+
+</html>
