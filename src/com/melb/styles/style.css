@@ -12,74 +12,47 @@ body {background-image: url("images/background.jpg");
     margin: 0;
 }
 
-header h1 {color:purple; 
-		font-size: 4em; 
-		font-weight: bold;
-		text-align: center; 
-		font-family: calibri,ebrima,arial;}
-		
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
 
-nav a {text-decoration: none;
-		color: #6600cc;
-		padding: 0.2em 0.6em;
-		background-color: #ccc;
-		text-align: left;
-		margin-left: 100px;}
-		
-nav {text-align: center;}
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
 
-aside, footer {font-style: italic;}
+.sidenav a:hover {
+    color: #f1f1f1;
+}
 
-#presentation1 {float: left; width:40%; text-align: center;}
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
 
-#presentation2 {float: left; width:40%; text-align: center;}
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
 
-#presentation3 {float: left; width:20%; text-align: center;}
-
-#otherformats {float: left; width:100%;}
-
-#relatedtech {float: left; width:100%;}
-
-.special {font-weight: bold; font-size: 1.5em;}
-
-a:hover {background-color: #6699ff;
-		color: white;}		
-
-h2 {color:#0000cc; font-size: 2em; font-weight:bold;}
-
-h3 {color:#6666ff; font-size: 1.8em; font-weight:bold;}
-
-h4 {color:#b3b3ff; font-size: 1.5em; font-weight:bold;}
-
-table, thead, td, th{border: 1px solid black;}
-
-thead {background-color: #ff0080; color: white;}
-
-tbody {background-color: #ff99cc;}
-
-aside {border: 4px double #cc33ff;
-		border-radius: 14px;
-		margin: 1em;
-		padding: 1em;
-		background: url(images/fade.jpg) repeat-x top left;
-		width: 25%;
-		float: right;}
-
-#content {border: 4px dotted #6699ff;
-		border-radius: 14px;
-		margin: 1em;
-		padding: 1em;
-		background: url(images/fade.jpg) repeat-x top left;
-		width: 30%;}
-
-#relatedtech ul li {list-style-type:square;}
-
-footer {border-top: 4px double darkgray;
-		clear: both;
-		text-align: center;
-		font-size: 0.8em;
-		}		
-		
-
-
-
+article {
+	
+	float: right;
+	width: 95%;
+}
