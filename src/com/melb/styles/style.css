@@ -57,12 +57,10 @@ body {background-image: url("images/background.jpg");
 }
 
 
-
-
-
-
 article {
 	
 	float: right;
 	width: 95%;
 }
+
+table, thead, td, th{border: 1px solid black;}

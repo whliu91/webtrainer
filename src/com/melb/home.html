@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="description" content="contain basic settings of website" />
+  <meta name="keywords" content="HTML, Homepage, Index" />
+  <meta name="author" content="A Student"  />
+  <link href="styles/style.css" rel="stylesheet"/>
+  <title>Home</title>
+</head>
+
+<body>
+	<div id="mySidenav" class="sidenav">
+	<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+	<a href="home.html">Home</a>
+	<a href="trainer.html">Trainer</a>
+	<a href="learnonline.html">Learn Online</a>
+	</div>
+
+
+	<span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; </span>
+
+	<script>
+	function openNav() {
+		document.getElementById("mySidenav").style.width = "250px";
+		document.getElementById("main").style.marginLeft = "250px";
+	}
+
+	function closeNav() {
+		document.getElementById("mySidenav").style.width = "0";
+		document.getElementById("main").style.marginLeft = "0";
+	}
+	</script>
+	
+	<div id="main">
+	
+	<nav>
+		<a href="#">Perform Prediction With Loaded Model</a>
+		<a href="#">Visualise Performance of Current Model</a>
+		<a href="#">Visualise Influence of Each Factor</a>
+	</nav>
+	
+	<table>
+		<thead>
+			<tr>
+				<a href="#">Perform Prediction With Loaded Model</a>
+				<a href="#">Visualise Performance of Current Model</a>
+				<a href="#">Visualise Influence of Each Factor</a>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+			<td><a>Display area</a></td>
+			</tr>
+		</tbody>
+	</table>
+	
+	</div>
+	
+</body>
+
+</html>
