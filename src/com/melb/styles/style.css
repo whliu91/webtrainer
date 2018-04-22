@@ -55,12 +55,3 @@ body {background-image: url("images/background.jpg");
   .sidenav {padding-top: 15px;}
   .sidenav a {font-size: 18px;}
 }
-
-
-article {
-	
-	float: right;
-	width: 95%;
-}
-
-table, thead, td, th{border: 1px solid black;}
