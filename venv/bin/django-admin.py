@@ -1,4 +1,4 @@
-#!/Users/whliu/Documents/work/github/web/webtrainer/venv/bin/python
+#!/Users/whliu/Documents/work/github/BVDN_tutorial/venv/bin/python
 from django.core import management
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-#!/Users/whliu/Documents/work/github/web/webtrainer/venv/bin/python
+#!/Users/whliu/Documents/work/github/BVDN_tutorial/venv/bin/python
 
 import sys
 import getopt

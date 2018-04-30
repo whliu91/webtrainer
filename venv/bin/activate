@@ -40,7 +40,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/Users/whliu/Documents/work/github/web/webtrainer/venv"
+VIRTUAL_ENV="/Users/whliu/Documents/work/github/BVDN_tutorial/venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
