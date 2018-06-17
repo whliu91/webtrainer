@@ -45,6 +45,12 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'users.User'
 
+# Specifies minimum length for passwords:
+USERS_PASSWORD_MIN_LENGTH = 5
+
+#Specifies maximum length for passwords:
+USERS_PASSWORD_MAX_LENGTH = None
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

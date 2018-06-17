@@ -42,7 +42,7 @@ def register(request,
         registered_user_redirect_to = getattr(settings, 'LOGIN_REDIRECT_URL')
 
     if request.user.is_authenticated:
-            return redirect(registered_user_redirect_to)
+        return redirect(registered_user_redirect_to)
 
     if not settings.USERS_REGISTRATION_OPEN:
         return redirect(reverse('users_registration_closed'))

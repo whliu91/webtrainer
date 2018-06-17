@@ -16,10 +16,12 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from main import views as main
+from NNModelManager import views as NNMMIndex
 
 urlpatterns = [
-	url(r'^$', main.login),
+	url(r'^$', main.index),
 	url(r'^accounts/', include('users.urls')),
 	url(r'^accounts/profile/', main.accounts_profile),
     url(r'^admin/', admin.site.urls),
+    url(r'^NNModelManager/', include('NNModelManager.urls')),
 ]
