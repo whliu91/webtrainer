@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="/static/res/favicon.ico">
 
     <title>Neural Network Trainer</title>
 
@@ -14,6 +13,7 @@
 
     <!-- Custom styles for this template -->
     <link href="/static/css/dashboard.css" rel="stylesheet">
+
   </head>
 
   <body>
@@ -22,7 +22,7 @@
       <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
       <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
-          <a class="nav-link" href="/accounts/logout/">Sign out</a>
+          <a class="nav-link" href="#">Sign out</a>
         </li>
       </ul>
     </nav>
@@ -45,7 +45,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/NNModelManager/config/">
+                <a class="nav-link" href="#">
                   <span data-feather="layers"></span>
                   Model Configurations
                 </a>
@@ -53,8 +53,9 @@
             </ul>
           </div>
         </nav>
-        {% block content %}
+
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+        {% block content %}
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Dashboard</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
@@ -68,11 +69,75 @@
           <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
 
           <h2>Data Entry</h2>
-          <div class="table-responsive">
-
+          <div id="vuejsblock">
+            <div>
+              <template v-if="shouldCreateNewModel">
+                <button @click="toggleModelCreateType" class="btn btn-secondary btn-lg btn-block">Use Existing Model</button><br>
+                <h3 align="center">Create New Model</h1>
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="modelNameAO" style="width: 200px">Model Name</span>
+                  </div>
+                  <input type="text" class="form-control" placeholder="model name" aria-label="Model name" aria-describedby="modelNameAO">
+                </div>
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="numInputAO" style="width: 200px">Number of Input</span>
+                  </div>
+                  <input type="text" class="form-control" placeholder="5" aria-label="Number of Input" aria-describedby="numInputAO">
+                </div>
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="numLayersAO" style="width: 200px">Number of Layers</span>
+                  </div>
+                  <input type="text" class="form-control" placeholder="5" aria-label="Number of Layers" aria-describedby="numLayersAO">
+                </div>
+                <button @click="applyModelBasicConfig" class="btn btn-secondary btn-lg btn-block">Apply</button><br>
+                <div id="vuejsblock">
+                <template v-if="shouldShowMoreConfig">
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <label class="input-group-text" for="optimFuncAO" style="width: 200px">Optimise functions</label>
+                    </div>
+                    <select class="custom-select" id="optimFuncAO">
+                      <option selected>Choose...</option>
+                      <option value="1">adam</option>
+                      <option value="2">sgd</option>
+                      <option value="3">etc..</option>
+                    </select>
+                  </div>
+                </template>
+                </div>
+              </template>
+              <template v-else="">
+                <button @click="toggleModelCreateType" class="btn btn-secondary btn-lg btn-block">Create New Model</button><br>
+                <table class="table">
+                    <thead class="thead-dark">
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Model Create Date</th>
+                        <th scope="col">Info</th>
+                        <th scope="col">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">1</th>
+                        <td>28/05/2018</td>
+                        <td><button class="btn btn-secondary">Model Info</button></td>
+                        <td>
+                          <button class="btn btn-success btn-block">Use Model</button><br>
+                          <button class="btn btn-danger btn-block">Delete Model</button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+              </template>
+            </div>
           </div>
-        </main>
+          </div>
         {% endblock %}
+        </main>
       </div>
     </div>
 
@@ -83,6 +148,27 @@
     <script>window.jQuery || document.write('<script src="/static/js/jquery-slim.min.js"><\/script>')</script>
     <script src="/static/js/popper.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/vue.js"></script>
+
+    {% block js %}
+    <!-- vuejs -->
+    <script>
+      new Vue({
+        el: '#vuejsblock',
+        data: {
+          shouldCreateNewModel: true,
+          shouldShowMoreConfig: false
+        },
+        methods: {
+          toggleModelCreateType: function () {
+            return this.shouldCreateNewModel = !this.shouldCreateNewModel, this.shouldShowMoreConfig = false
+          },
+          applyModelBasicConfig: function () {
+            return this.shouldShowMoreConfig = true
+          }
+        }
+      })
+    </script>
 
     <!-- Icons -->
     <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
@@ -121,5 +207,6 @@
         }
       });
     </script>
+    {% endblock %}
   </body>
 </html>
