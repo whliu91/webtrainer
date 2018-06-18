@@ -7,10 +7,10 @@ For developers who is working on or want to contribute to the project. The web a
 ### Prerequisite-Tools
 
 #### Front End
-*BootStrap - multiple version see html templates in templates folders.*
+*BootStrap - multiple version see html templates in templates folders.* <br />
 *Vue.js 2.0*
 
 #### Back End
-*Django 1.11.8 - Because we are using django-users2 for simplify developing a user management application, which is only compatible with Django 1, in case migration to Django 2 is required, we will have to re-implement the user management function.*
-*Python 3.6.5*
-*MySQL 5.7.22 - Django 1 is not compatible with the current latest MySQL(8.0), if upgrade required will have to upgrade Django version first*
+*Django 1.11.8 - Because we are using django-users2 for simplify developing a user management application, which is only compatible with Django 1, in case migration to Django 2 is required, we will have to re-implement the user management function.* <br />
+*Python 3.6.5* <br />
+*MySQL 5.7.22 - Django 1 is not compatible with the current latest MySQL(8.0), if upgrade required will have to upgrade Django version first* <br />
