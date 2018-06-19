@@ -68,29 +68,38 @@
 
           <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
 
-          <h2>Data Entry</h2>
+          <h1>Data Entry</h1>
           <div id="vuejsblock">
             <div>
               <template v-if="shouldCreateNewModel">
                 <button @click="toggleModelCreateType" class="btn btn-secondary btn-lg btn-block">Use Existing Model</button><br>
                 <h3 align="center">Create New Model</h1>
+                <template v-if="shouldShowErrorMessage">
+                  <p class="text-warning">Error: [[errorMessage]]</p>
+                </template>
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                    <span class="input-group-text" id="modelNameAO" style="width: 200px">Model Name</span>
+                    <span class="input-group-text" style="width: 200px">Model Name</span>
                   </div>
-                  <input type="text" class="form-control" placeholder="model name" aria-label="Model name" aria-describedby="modelNameAO">
+                  <input type="text" class="form-control" v-model="modelNameAO" placeholder="model name" aria-label="Model name" aria-describedby="modelNameAO">
                 </div>
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                    <span class="input-group-text" id="numInputAO" style="width: 200px">Number of Input</span>
+                    <span class="input-group-text" style="width: 200px">Number of Input</span>
                   </div>
-                  <input type="text" class="form-control" placeholder="5" aria-label="Number of Input" aria-describedby="numInputAO">
+                  <input type="text" class="form-control" v-model="numInputAO" placeholder="5" aria-label="Number of Input" aria-describedby="numInputAO">
                 </div>
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                    <span class="input-group-text" id="numLayersAO" style="width: 200px">Number of Layers</span>
+                    <span class="input-group-text" style="width: 200px">Number of Layers</span>
                   </div>
-                  <input type="text" class="form-control" placeholder="5" aria-label="Number of Layers" aria-describedby="numLayersAO">
+                  <input type="text" class="form-control" v-model="numLayersAO" placeholder="5" aria-label="Number of Layers" aria-describedby="numLayersAO">
+                </div>
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" style="width: 200px">Number of Neurons</span>
+                  </div>
+                  <input type="text" class="form-control" v-model="numNeuronsPerLayersAO" placeholder="Input for all layers, seperate by comma ',' e.g. 3,5,2" aria-label="Number of Neurons" aria-describedby="numNeuronsPerLayersAO">
                 </div>
                 <button @click="applyModelBasicConfig" class="btn btn-secondary btn-lg btn-block">Apply</button><br>
                 <div id="vuejsblock">
@@ -99,13 +108,14 @@
                     <div class="input-group-prepend">
                       <label class="input-group-text" for="optimFuncAO" style="width: 200px">Optimise functions</label>
                     </div>
-                    <select class="custom-select" id="optimFuncAO">
+                    <select class="custom-select" v-model="optimFuncAO">
                       <option selected>Choose...</option>
                       <option value="1">adam</option>
                       <option value="2">sgd</option>
                       <option value="3">etc..</option>
                     </select>
                   </div>
+                  <button @click="saveNewModel" class="btn btn-secondary btn-lg btn-block">Create</button><br>
                 </template>
                 </div>
               </template>
@@ -157,14 +167,99 @@
         el: '#vuejsblock',
         data: {
           shouldCreateNewModel: true,
-          shouldShowMoreConfig: false
+          shouldShowMoreConfig: false,
+          shouldShowErrorMessage: false,
+          modelNameAO: "",
+          numInputAO: "",
+          numLayersAO: "",
+          numNeuronsPerLayersAO: "",
+          optimFuncAO: "",
+          errorMessage: "unknown error"
         },
+        delimiters: ["[[","]]"],
         methods: {
           toggleModelCreateType: function () {
             return this.shouldCreateNewModel = !this.shouldCreateNewModel, this.shouldShowMoreConfig = false
           },
+          checkNeuronString: function(str){
+            var array = str.split(',');
+            if (array.length != parseInt(this.numLayersAO))
+            {
+              // neuron array does not match number of layers
+              return false
+            }
+            else
+            {
+              var i;
+              for (i = 0; i < parseInt(this.numLayersAO); i++)
+              {
+                var value = parseInt(array[i]);
+                if (value < 0 | value > 100 | isNaN(value))
+                {
+                  // neuron range error
+                  return false
+                }
+              }
+            }
+            return true
+          },
           applyModelBasicConfig: function () {
+            if (this.modelNameAO.length == 0)
+            {
+              this.errorMessage = "Model name invalid";
+              this.shouldShowErrorMessage = true;
+              return this.shouldShowMoreConfig = false
+            }
+            if ((this.numInputAO < 1) | (this.numInputAO > 50))
+            {
+              this.errorMessage = "Invalid number of input (1 ~ 50)";
+              this.shouldShowErrorMessage = true;
+              return this.shouldShowMoreConfig = false
+            }
+            if ((this.numLayersAO < 2) | (this.numLayersAO > 10))
+            {
+              this.errorMessage = "Invalid number of layers (2 ~ 10)";
+              this.shouldShowErrorMessage = true;
+              return this.shouldShowMoreConfig = false
+            }
+            if (!this.checkNeuronString(this.numNeuronsPerLayersAO))
+            {
+              this.errorMessage = "Invalid neurons string format";
+              this.shouldShowErrorMessage = true;
+              return this.shouldShowMoreConfig = false
+            }
+            this.shouldShowErrorMessage = false;
             return this.shouldShowMoreConfig = true
+          },
+          saveNewModel: function(){
+            var optimFuncDic = {
+              "1": "adam",
+              "2": "sgd",
+              "3": "etc"
+            }
+            if (!optimFuncDic.hasOwnProperty(this.optimFuncAO))
+            {
+              this.errorMessage = "invalid selection on optimise function";
+              return this.shouldShowErrorMessage = true;
+            }
+            this.shouldShowErrorMessage = false;
+            data_to_send = {
+                name: this.name,
+                company: this.company,
+            };
+            /*
+            data_to_send = JSON.stringify(data_to_send);
+            console.log(data_to_send);
+            $.post('/accounts/profile/',
+                    data_to_send,
+                    function(r, err){
+                        if(err === 'success'){
+                            alert('saved')
+                            return location.assign('/');
+                        }else{
+                            return console.log(err);
+                        } 
+                    });*/
           }
         }
       })
