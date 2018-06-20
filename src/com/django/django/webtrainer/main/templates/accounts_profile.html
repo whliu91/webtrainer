@@ -41,24 +41,23 @@
         company: '{{ request.user.company }}'
     },
     methods:{
-        submit(){
+        submit: function(){
             data_to_send = {
                 name: this.name,
                 company: this.company,
             };
             console.log(data_to_send);
-            data_to_send = JSON.stringify(data_to_send);
-            console.log(data_to_send);
-            $.post('/accounts/profile/',
-                    data_to_send,
-                    function(r, err){
-                        if(err === 'success'){
-                            alert('saved')
-                            return location.assign('/');
-                        }else{
-                            return console.log(err);
-                        } 
-                    });
+            axios.post(
+                '/accounts/profile/',
+                data_to_send
+            )
+            .then(function(response){
+                alert('saved')
+                return location.assign('/');
+            })
+            .catch(function(error){
+                console.log(error);
+            });
         },
     },
 });

@@ -1,10 +1,12 @@
 from django.shortcuts import render
 import json
+from django.views.decorators.csrf import csrf_exempt
 from users.models import User
 
 def index(request):
 	return render(request, 'basemain.html')
 
+@csrf_exempt
 def accounts_profile(request):
 	print("[DEBUG] request on accounts_profile")
 	if request.method == 'POST':

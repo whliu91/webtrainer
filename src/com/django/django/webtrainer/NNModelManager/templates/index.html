@@ -7,12 +7,12 @@
     <meta name="author" content="">
 
     <title>Neural Network Trainer</title>
-
+    {% load static %}
     <!-- Bootstrap core CSS -->
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="/static/css/dashboard.css" rel="stylesheet">
+    <link href="{% static "css/dashboard.css" %}" rel="stylesheet">
 
   </head>
 
@@ -33,21 +33,15 @@
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
               <li class="nav-item">
-                <a class="nav-link active" href="#">
+                <a class="nav-link active" href="/NNModelManager/NNModelHome/">
                   <span data-feather="home"></span>
                   Dashboard <span class="sr-only">(current)</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="/NNModelManager/dataManage/">
                   <span data-feather="file"></span>
                   Data Managerment
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="layers"></span>
-                  Model Configurations
                 </a>
               </li>
             </ul>
@@ -68,7 +62,7 @@
 
           <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
 
-          <h1>Data Entry</h1>
+          <h1>Model Configurations</h1>
           <div id="vuejsblock">
             <div>
               <template v-if="shouldCreateNewModel">
@@ -110,9 +104,9 @@
                     </div>
                     <select class="custom-select" v-model="optimFuncAO">
                       <option selected>Choose...</option>
-                      <option value="1">adam</option>
-                      <option value="2">sgd</option>
-                      <option value="3">etc..</option>
+                      <option value="1">mape</option>
+                      <option value="2">mse</option>
+                      <option value="3">mae</option>
                     </select>
                   </div>
                   <button @click="saveNewModel" class="btn btn-secondary btn-lg btn-block">Create</button><br>
@@ -154,12 +148,11 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/static/js/jquery.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script>window.jQuery || document.write('<script src="/static/js/jquery-slim.min.js"><\/script>')</script>
-    <script src="/static/js/popper.min.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/vue.js"></script>
-
+    <script src="{% static "js/jquery.js" %}"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="{% static "js/popper.min.js" %}"></script>
+    <script src="{% static "js/bootstrap.min.js" %}"></script>
+    <script src="{% static "js/vue.js" %}"></script>
     {% block js %}
     <!-- vuejs -->
     <script>
@@ -233,9 +226,9 @@
           },
           saveNewModel: function(){
             var optimFuncDic = {
-              "1": "adam",
-              "2": "sgd",
-              "3": "etc"
+              "1": "mape",
+              "2": "mse",
+              "3": "mae"
             }
             if (!optimFuncDic.hasOwnProperty(this.optimFuncAO))
             {
@@ -244,22 +237,27 @@
             }
             this.shouldShowErrorMessage = false;
             data_to_send = {
-                name: this.name,
-                company: this.company,
+                command: "save_json_model",
+                model_name: this.modelNameAO,
+                num_input: this.numInputAO,
+                num_layers: this.numLayersAO,
+                num_neuron_layer_str: this.numNeuronsPerLayersAO,
+                optimise_function: optimFuncDic[this.optimFuncAO]
             };
-            /*
             data_to_send = JSON.stringify(data_to_send);
             console.log(data_to_send);
-            $.post('/accounts/profile/',
-                    data_to_send,
-                    function(r, err){
-                        if(err === 'success'){
-                            alert('saved')
-                            return location.assign('/');
-                        }else{
-                            return console.log(err);
-                        } 
-                    });*/
+            axios.post('/NNModelManager/NNModelHome/',
+                    data_to_send)
+                    .then(function(response){
+                      console.log(response);
+                      if (response.data == 1)
+                      {
+                        alert("the model name you have entered already exist, please use another one");
+                      }
+                    })
+                    .catch(function(error){
+                      console.log(error);
+                    });
           }
         }
       })

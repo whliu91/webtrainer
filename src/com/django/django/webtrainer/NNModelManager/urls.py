@@ -3,5 +3,5 @@ from NNModelManager import views
 
 urlpatterns = [
     url(r'^NNModelHome/$', views.index),
-    url(r'^config/$', views.model_config),
+    url(r'^dataManage/$', views.dataManage),
 ]

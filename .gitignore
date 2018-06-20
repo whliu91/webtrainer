@@ -4,3 +4,5 @@ venv/
 .vscode/
 # ignore pycache
 __pycache__/
+# ignore db files
+sqlite
