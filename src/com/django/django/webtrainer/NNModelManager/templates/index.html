@@ -14,6 +14,9 @@
     <!-- Custom styles for this template -->
     <link href="{% static "css/dashboard.css" %}" rel="stylesheet">
 
+    <!-- iView CSS -->
+    <link rel="stylesheet" href="//unpkg.com/iview/dist/styles/iview.css">
+
   </head>
 
   <body>
@@ -42,6 +45,12 @@
                 <a class="nav-link" href="/NNModelManager/dataManage/">
                   <span data-feather="file"></span>
                   Data Managerment
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/NNModelManager/Operations/">
+                  <span data-feather="file"></span>
+                  Operations
                 </a>
               </li>
             </ul>
@@ -113,29 +122,15 @@
                 </template>
                 </div>
               </template>
-              <template v-else="">
+              <template v-else-if="loadComplete">
                 <button @click="toggleModelCreateType" class="btn btn-secondary btn-lg btn-block">Create New Model</button><br>
-                <table class="table">
-                    <thead class="thead-dark">
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Model Create Date</th>
-                        <th scope="col">Info</th>
-                        <th scope="col">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row">1</th>
-                        <td>28/05/2018</td>
-                        <td><button class="btn btn-secondary">Model Info</button></td>
-                        <td>
-                          <button class="btn btn-success btn-block">Use Model</button><br>
-                          <button class="btn btn-danger btn-block">Delete Model</button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div><history-model-list :json="json"></history-model-list></div>
+              </template>
+              <template v-else>
+                <spin>
+                    <icon type="load-c" size=18 class="demo-spin-icon-load"></icon>
+                    <div>Loading</div>
+                </spin>
               </template>
             </div>
           </div>
@@ -153,7 +148,89 @@
     <script src="{% static "js/popper.min.js" %}"></script>
     <script src="{% static "js/bootstrap.min.js" %}"></script>
     <script src="{% static "js/vue.js" %}"></script>
+    <!-- TODO: download ivew and axios from npm and replace this -->
+    <script src="//unpkg.com/iview/dist/iview.min.js"></script>
     {% block js %}
+    <!-- iView Table -->
+    <script>
+    var HistoryModelList = {
+      props: ["json"],
+      data: function() {
+        return {
+          columnsList: [
+            {
+                title: "Model Name",
+                key: "model_name",
+                width: 200,
+            },
+            {
+                title: "Number of Layers",
+                key: "num_layers",
+                width: 180,
+                sortable: true
+            },
+            {
+                title: "Min Train Error",
+                key: "min_train_err",
+                width: 150,
+                sortable: true
+            },
+            {
+                title: "Create Date",
+                key: "src_date",
+                width: 150,
+                sortable: true
+            },
+            {
+                title: "Create User",
+                key: "user_created",
+                width: 370
+            },
+            {
+                title: 'Action',
+                key: 'action',
+                width: 150,
+                align: 'center',
+                render: (h, params) => {
+                    return h('div', [
+                        h('Button', {
+                            props: {
+                                type: 'primary',
+                                size: 'small'
+                            },
+                            style: {
+                                marginRight: '5px'
+                            },
+                            on: {
+                                click: () => {
+                                    this.show(params.index)
+                                }
+                            }
+                        }, 'Select'),
+                        h('Button', {
+                            props: {
+                                type: 'error',
+                                size: 'small'
+                            },
+                            on: {
+                                click: () => {
+                                    this.remove(params.index)
+                                }
+                            }
+                        }, 'Delete')
+                    ]);
+                }
+            }
+          ]
+        };
+      },
+      template: `
+          <div style="width:100%; height:100%; padding:20px;">
+              <Table style="width:1200px; height:100%;" border :columns="columnsList" :data="json.records" v-if="json.result=='success'"></Table>
+          </div>
+      `
+    };
+    </script>
     <!-- vuejs -->
     <script>
       new Vue({
@@ -167,12 +244,36 @@
           numLayersAO: "",
           numNeuronsPerLayersAO: "",
           optimFuncAO: "",
-          errorMessage: "unknown error"
+          errorMessage: "unknown error",
+          loadComplete: false,
+          json: null
         },
         delimiters: ["[[","]]"],
         methods: {
           toggleModelCreateType: function () {
-            return this.shouldCreateNewModel = !this.shouldCreateNewModel, this.shouldShowMoreConfig = false
+            var $this = this;
+            this.shouldShowMoreConfig = false;
+            this.shouldCreateNewModel = !this.shouldCreateNewModel;
+            if (!this.shouldCreateNewModel)
+            {
+              // query db to get all models
+              data_to_send = {
+                command: "get_history_model",
+              };
+              data_to_send = JSON.stringify(data_to_send);
+              console.log(data_to_send);
+              axios.post('/NNModelManager/NNModelHome/',
+                      data_to_send)
+                      .then(function(response){
+                        $this.loadComplete = true;
+                        $this.json = response.data;
+                        console.log($this.json.records);
+                      })
+                      .catch(function(error){
+                        console.log(error);
+                      });
+            }
+            return
           },
           checkNeuronString: function(str){
             var array = str.split(',');
@@ -254,13 +355,20 @@
                       {
                         alert("the model name you have entered already exist, please use another one");
                       }
+                      else
+                      {
+                        // TODO: redirect to model view 
+                      }
                     })
                     .catch(function(error){
                       console.log(error);
                     });
           }
+        },
+        components: {
+          'history-model-list': HistoryModelList
         }
-      })
+      });
     </script>
 
     <!-- Icons -->

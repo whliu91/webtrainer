@@ -1,10 +1,12 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import json
+from django.core import serializers
 from datetime import datetime
 from users.models import User
 from NNModelManager.models import NNModelHistory
 from django.views.decorators.csrf import csrf_exempt
+from util.DataConversion import QuerySetValuesToDictionOfStrings
 
 
 @csrf_exempt
@@ -45,8 +47,26 @@ def index(request):
                 )
                 print("[DEBUG] successfully saved model")
                 return HttpResponse(0)
+        elif (model_json['command'] == "get_history_model"):
+            print("[DEBUG] query all history models")
+            all_models = NNModelHistory.objects.values(
+                "model_name",
+                "num_layers",
+                "min_train_err",
+                "src_date",
+                "user_created"
+            )
+            ret = {
+                "header": "all models",
+                "result": "success",
+                "records": QuerySetValuesToDictionOfStrings(all_models)
+            }
+            return JsonResponse(ret)
 
     return render(request, 'index.html')
 
 def dataManage(request):
     return render(request, 'data_management.html')
+
+def operations(request):
+    return render(request, 'operations.html')
