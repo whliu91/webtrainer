@@ -47,6 +47,7 @@ def index(request):
                 )
                 print("[DEBUG] successfully saved model")
                 return HttpResponse(0)
+
         elif (model_json['command'] == "get_history_model"):
             print("[DEBUG] query all history models")
             all_models = NNModelHistory.objects.values(
@@ -62,6 +63,12 @@ def index(request):
                 "records": QuerySetValuesToDictionOfStrings(all_models)
             }
             return JsonResponse(ret)
+
+        elif (model_json['command'] == "delete_model"):
+            model_name = model_json['model_name']
+            print("[DEBUG] delete model request: " + model_name)
+            NNModelHistory.objects.filter(model_name=model_name).delete()
+            return HttpResponse("model deleted from database: " + model_name)
 
     return render(request, 'index.html')
 

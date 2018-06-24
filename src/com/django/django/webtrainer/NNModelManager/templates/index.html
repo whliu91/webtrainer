@@ -125,6 +125,7 @@
               <template v-else-if="loadComplete">
                 <button @click="toggleModelCreateType" class="btn btn-secondary btn-lg btn-block">Create New Model</button><br>
                 <div><history-model-list :json="json"></history-model-list></div>
+                <confirm-delete-modal></confirm-delete-modal>
               </template>
               <template v-else>
                 <spin>
@@ -151,6 +152,63 @@
     <!-- TODO: download ivew and axios from npm and replace this -->
     <script src="//unpkg.com/iview/dist/iview.min.js"></script>
     {% block js %}
+    <!-- global event hub -->
+    <script>
+    Vue.prototype.$eventHub = new Vue(); // Global event bus
+    new Vue({
+      template: '<App/>',
+    });
+    </script>
+    <!-- iView modal -->
+    <script>
+    var confirmDeleteDialog = {
+      data: function(){
+        return{
+          confirm_modal1: false,
+          target_model: null
+        }
+      },
+      delimiters: ["[[","]]"],
+      methods:{
+        showModal(name){
+          this.confirm_modal1 = true;
+          this.target_model = name;
+        },
+        ok(){
+          console.log('confirmed delete model, posting to backend');
+          data_to_send = {
+                command: "delete_model",
+                model_name: this.target_model
+              };
+          data_to_send = JSON.stringify(data_to_send);
+          console.log(data_to_send);
+          axios.post('/NNModelManager/NNModelHome/',
+                  data_to_send)
+                  .then(function(response){
+                    console.log(response);
+                  })
+                  .catch(function(error){
+                    console.log(error);
+                  });
+        },
+        cancel(){
+          console.log('delete canceled')
+        }
+      },
+      created() {
+        this.$eventHub.$on('showModalEvent', this.showModal);
+      },
+      template: `
+        <Modal
+            v-model="confirm_modal1"
+            title="Confirm Delete"
+            @on-ok="ok"
+            @on-cancel="cancel">
+            <p>Confirm Delete all reference of this model: [[target_model]]</p>
+        </Modal>
+      `
+    };
+    </script>
     <!-- iView Table -->
     <script>
     var HistoryModelList = {
@@ -161,12 +219,12 @@
             {
                 title: "Model Name",
                 key: "model_name",
-                width: 200,
+                width: 110,
             },
             {
                 title: "Number of Layers",
                 key: "num_layers",
-                width: 180,
+                width: 160,
                 sortable: true
             },
             {
@@ -178,13 +236,13 @@
             {
                 title: "Create Date",
                 key: "src_date",
-                width: 150,
+                width: 130,
                 sortable: true
             },
             {
                 title: "Create User",
                 key: "user_created",
-                width: 370
+                width: 150
             },
             {
                 title: 'Action',
@@ -203,7 +261,6 @@
                             },
                             on: {
                                 click: () => {
-                                    this.show(params.index)
                                 }
                             }
                         }, 'Select'),
@@ -214,7 +271,10 @@
                             },
                             on: {
                                 click: () => {
-                                    this.remove(params.index)
+                                  var name = params.row.model_name;
+                                  console.log("request to remove model: " + name);
+                                  this.$eventHub.$emit('showModalEvent', name);
+                                  this.remove(params.index)
                                 }
                             }
                         }, 'Delete')
@@ -224,9 +284,14 @@
           ]
         };
       },
+      methods: {
+        remove(index){
+          this.json.records.splice(index, 1);
+        }
+      },
       template: `
           <div style="width:100%; height:100%; padding:20px;">
-              <Table style="width:1200px; height:100%;" border :columns="columnsList" :data="json.records" v-if="json.result=='success'"></Table>
+              <Table style="height:100%;" border :columns="columnsList" :data="json.records" v-if="json.result=='success'"></Table>
           </div>
       `
     };
@@ -366,7 +431,8 @@
           }
         },
         components: {
-          'history-model-list': HistoryModelList
+          'history-model-list': HistoryModelList,
+          'confirm-delete-modal': confirmDeleteDialog
         }
       });
     </script>
