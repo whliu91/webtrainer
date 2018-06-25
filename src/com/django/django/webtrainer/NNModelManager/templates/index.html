@@ -165,16 +165,20 @@
       data: function(){
         return{
           confirm_modal1: false,
-          target_model: null
+          target_model: null,
+          target_row: null
         }
       },
       delimiters: ["[[","]]"],
       methods:{
-        showModal(name){
+        showModal(data){
           this.confirm_modal1 = true;
-          this.target_model = name;
+          this.target_model = data.name;
+          this.target_row = data.index;
         },
         ok(){
+          // save this for emit event
+          var $this = this;
           console.log('confirmed delete model, posting to backend');
           data_to_send = {
                 command: "delete_model",
@@ -185,7 +189,9 @@
           axios.post('/NNModelManager/NNModelHome/',
                   data_to_send)
                   .then(function(response){
-                    console.log(response);
+                    console.log(response.data);
+                    var data = this.target_row;
+                    $this.$eventHub.$emit('model_deleted', data);
                   })
                   .catch(function(error){
                     console.log(error);
@@ -197,6 +203,9 @@
       },
       created() {
         this.$eventHub.$on('showModalEvent', this.showModal);
+      },
+      beforeDestroy() {
+        this.$eventHub.$off('showModalEvent');
       },
       template: `
         <Modal
@@ -271,10 +280,12 @@
                             },
                             on: {
                                 click: () => {
-                                  var name = params.row.model_name;
-                                  console.log("request to remove model: " + name);
-                                  this.$eventHub.$emit('showModalEvent', name);
-                                  this.remove(params.index)
+                                  var data = {
+                                    name: params.row.model_name,
+                                    index: params.index
+                                  };
+                                  console.log("request to remove model: " + data.name);
+                                  this.$eventHub.$emit('showModalEvent', data);
                                 }
                             }
                         }, 'Delete')
@@ -285,9 +296,19 @@
         };
       },
       methods: {
+        deleteRow(data){
+          console.log("eventHub: require delete row event: " + data)
+          this.remove(data);
+        },
         remove(index){
           this.json.records.splice(index, 1);
         }
+      },
+      created() {
+        this.$eventHub.$on('model_deleted', this.deleteRow);
+      },
+      beforeDestroy() {
+        this.$eventHub.$off('model_deleted');
       },
       template: `
           <div style="width:100%; height:100%; padding:20px;">
