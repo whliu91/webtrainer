@@ -1,15 +1,90 @@
 {% extends 'index.html' %}
 {% block content %}
-<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Data Management</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-      <div class="btn-group mr-2">
-
-      </div>
+<h1>Data Management</h1>
+<div id="vuejsblock">
+  <template v-if="isModelSelected">
+    <div class="container jumbotron" style="margin-top: 5px">
+      <h3>Model <a href='/NNModelManager/NNModelHome/' class="btn btn-dark">Select Another</a></h3>
+      <div><selected-model-list :json="json"></selected-model-list></div>
     </div>
-  </div>
-</main>
+    <div class="container jumbotron" style="margin-top: 5px">
+      <h3>Data</h3>
+    </div>
+  </template>
+  <template v-else>
+      <a href='/NNModelManager/NNModelHome/' class="btn btn-secondary btn-lg btn-block">SELECT OR CREATE A MODEL</a>
+  </template>
+</div>
 {% endblock %}
 {% block js %}
+<script>
+  var SelectedModelList = {
+    props: ["json"],
+    data: function() {
+      return {
+        columnsList: [
+          {
+              title: "Model Name",
+              key: "model_name",
+          },
+          {
+              title: "Number of Layers",
+              key: "num_layers",
+          },
+          {
+              title: "Input size",
+              key: "input_size",
+          },
+          {
+              title: "Create Date",
+              key: "src_date",
+          },
+         ]
+      };
+    },
+    template: `
+        <div style="width:100%; height:100%; padding:20px;">
+            <Table style="height:100%;" border :columns="columnsList" :data="json.records" v-if="json.result=='success'"></Table>
+        </div>
+    `
+  };
+</script>
+<script>
+  new Vue({
+    el: '#vuejsblock',
+    data: {
+      isModelSelected: false,
+      json: null,
+    },
+    delimiters: ["[[","]]"],
+    methods: {
+      checkModel(){
+        var $this = this;
+        data_to_send = {
+            command: "check_model",
+        };
+        axios.post(
+            '/NNModelManager/dataManage/',
+            data_to_send
+        )
+        .then(function(response){
+          console.log(response.data.records);
+          if (response.data != 0){
+            $this.isModelSelected = true;
+            $this.json = response.data;
+          }
+        })
+        .catch(function(error){
+          console.log(error);
+        });
+      }
+    },
+    beforeMount(){
+      this.checkModel()
+    },
+    components: {
+      'selected-model-list': SelectedModelList,
+    }
+  });
+</script>
 {% endblock %}

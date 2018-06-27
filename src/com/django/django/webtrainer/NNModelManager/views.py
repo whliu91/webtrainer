@@ -1,5 +1,7 @@
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.core.urlresolvers import reverse  
+from django.shortcuts import redirect 
 import json
 from django.core import serializers
 from datetime import datetime
@@ -69,10 +71,40 @@ def index(request):
             print("[DEBUG] delete model request: " + model_name)
             NNModelHistory.objects.filter(model_name=model_name).delete()
             return HttpResponse("model deleted from database: " + model_name)
+        
+        elif (model_json['command'] == "user_select_model"):
+            model_name = model_json['model_name']
+            print("[DEBUG] select model request: " + model_name)
+            user_profile_toChange = User.objects.get(email=request.user.email)
+            user_profile_toChange.current_selected_model_name = model_name
+            user_profile_toChange.save()
+            return HttpResponseRedirect('/NNModelManager/dataManage/')
 
     return render(request, 'index.html')
 
+
+@csrf_exempt
 def dataManage(request):
+    if request.method == 'POST':
+        model_json = json.loads(request.body)
+        if (model_json['command'] == "check_model"):
+            model = request.user.current_selected_model_name
+            if not model:
+                return HttpResponse(1)
+            else:
+                target_model_obj = NNModelHistory.objects.get(model_name=model)
+                ret = {
+                    "header": "selected model",
+                    "result": "success",
+                    "records": [{
+                        "model_name": str(model),
+                        "src_date": str(target_model_obj.src_date.strftime('%Y-%m-%d')),
+                        "num_layers": str(target_model_obj.num_layers),
+                        "input_size": str(target_model_obj.input_size),
+                    }]
+                }
+                return JsonResponse(ret)
+
     return render(request, 'data_management.html')
 
 def operations(request):

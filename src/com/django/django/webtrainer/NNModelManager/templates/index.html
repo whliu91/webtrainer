@@ -16,7 +16,13 @@
 
     <!-- iView CSS -->
     <link rel="stylesheet" href="//unpkg.com/iview/dist/styles/iview.css">
-
+    {% block header %}
+    <style>
+      body{
+        padding-top: 70px; /* avoid bootstrap navbar block content */
+      }
+    </style>
+    {% endblock %}
   </head>
 
   <body>
@@ -270,6 +276,8 @@
                             },
                             on: {
                                 click: () => {
+                                  console.log("request to select model: " + params.row.model_name);
+                                  this.select(params.row.model_name);
                                 }
                             }
                         }, 'Select'),
@@ -302,6 +310,23 @@
         },
         remove(index){
           this.json.records.splice(index, 1);
+        },
+        select(model){
+          data_to_send = {
+                command: "user_select_model",
+                model_name: model
+              };
+          data_to_send = JSON.stringify(data_to_send);
+          axios.post('/NNModelManager/NNModelHome/',
+                    data_to_send)
+                    .then(function(response){
+                      console.log(response)
+                      var url = response.request.responseURL;
+                      window.location.href = url;
+                    })
+                    .catch(function(error){
+                      console.log(error);
+                    });
         }
       },
       created() {

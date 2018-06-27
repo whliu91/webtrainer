@@ -66,6 +66,7 @@ class User(AbstractUser):
     """
     username = models.CharField(max_length=20, default='default user')
     company = models.CharField(max_length=50, default='default company')
+    current_selected_model_name = models.CharField(max_length=50, default=None, blank=True, null=True)
 
     class Meta(AbstractUser.Meta):
         swappable = 'AUTH_USER_MODEL'
