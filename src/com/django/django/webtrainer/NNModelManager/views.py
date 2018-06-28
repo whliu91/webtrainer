@@ -7,8 +7,12 @@ from django.core import serializers
 from datetime import datetime
 from users.models import User
 from NNModelManager.models import NNModelHistory
+from NNModelManager.util.trainer_util import acceptNewDataFile
 from django.views.decorators.csrf import csrf_exempt
 from util.DataConversion import QuerySetValuesToDictionOfStrings
+from django.conf import settings
+import os
+from django.core.files.storage import FileSystemStorage
 
 
 @csrf_exempt
@@ -25,6 +29,9 @@ def index(request):
             model_num_neuron_layer_str = model_json['num_neuron_layer_str']
             model_optim_func = model_json['optimise_function']
             model_src_date = datetime.now()
+            # create DIR for upload files
+            model_data_dir= os.path.join(settings.MEDIA_ROOT, 'uploads', model_name)
+            os.mkdir(model_data_dir)
             # check model existance
             if NNModelHistory.objects.filter(model_name=model_name).exists():
                 print("[DEBUG] error: model name exists in db")
@@ -101,11 +108,33 @@ def dataManage(request):
                         "src_date": str(target_model_obj.src_date.strftime('%Y-%m-%d')),
                         "num_layers": str(target_model_obj.num_layers),
                         "input_size": str(target_model_obj.input_size),
-                    }]
+                    }],
+                    "data_headers": target_model_obj.current_data_header,
+                    "data_rows": str(target_model_obj.data_rows)
                 }
+                print(target_model_obj.current_data_header)
                 return JsonResponse(ret)
 
     return render(request, 'data_management.html')
 
+
+@csrf_exempt
+def acceptDataUpload(request):
+    if request.method == 'POST':
+        model_name = request.POST["model_name"]
+        uploaded_file = request.FILES['file']
+        print("[DEBUG] upload request received: " + uploaded_file.name)
+        save_path = os.path.join(settings.BASE_DIR, 'uploads', model_name)
+        fs = FileSystemStorage(location=save_path)
+        filename = fs.save(uploaded_file.name, uploaded_file)
+        if(acceptNewDataFile(model_name, os.path.join(save_path, uploaded_file.name))):
+            return HttpResponse(1)
+        else:
+            return HttpResponse("unknown")
+
+    return HttpResponse("unknown")
+
+
+@csrf_exempt
 def operations(request):
     return render(request, 'operations.html')

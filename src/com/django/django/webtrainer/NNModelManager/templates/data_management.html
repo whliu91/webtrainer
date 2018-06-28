@@ -9,6 +9,28 @@
     </div>
     <div class="container jumbotron" style="margin-top: 5px">
       <h3>Data</h3>
+      <template v-if="isDataAvailable">
+        <br><p class="text-primary">Number of rows of data available: </p>
+        <p class="text-danger">[[data_rows]]</p><br>
+        <Input v-model="data_headers" type="textarea" :rows="4" placeholder="Current Headers"></Input>
+      </template>
+      <template v-else>
+        <br><p class="text-warning">No data available for this model yet.</p><br>
+        <template>
+          <Upload
+            multiple
+            type="drag"
+            accept=".csv"
+            :data="upload_header_data"
+            :on-success="uploadSuccess"
+            action="/NNModelManager/uploadDataForModel/">
+            <div style="padding: 20px 0">
+                <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+                <p>Click or drag files here to upload</p>
+            </div>
+          </Upload>
+        </template>
+      </template>
     </div>
   </template>
   <template v-else>
@@ -54,6 +76,10 @@
     el: '#vuejsblock',
     data: {
       isModelSelected: false,
+      isDataAvailable: false,
+      data_rows: null,
+      data_headers: null,
+      upload_header_data: null,
       json: null,
     },
     delimiters: ["[[","]]"],
@@ -68,15 +94,29 @@
             data_to_send
         )
         .then(function(response){
-          console.log(response.data.records);
+          console.log("Selected data: " + response.data.records[0]["model_name"]);
           if (response.data != 0){
             $this.isModelSelected = true;
             $this.json = response.data;
+            $this.upload_header_data = {
+              model_name: response.data.records[0]["model_name"],
+            };
+            if (!response.data.data_headers){
+              $this.isDataAvailable = false;
+            }
+            else{
+              $this.isDataAvailable = true;
+              $this.data_rows = response.data.data_rows;
+              $this.data_headers = response.data.data_headers;
+            }
           }
         })
         .catch(function(error){
           console.log(error);
         });
+      },
+      uploadSuccess(response, file, fileList){
+        alert("success")
       }
     },
     beforeMount(){

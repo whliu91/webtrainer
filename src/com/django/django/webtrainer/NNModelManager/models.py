@@ -30,6 +30,8 @@ class NNModelHistory(models.Model):
     weights_json = models.CharField(max_length=500, default=None, blank=True, null=True)
     min_train_err = models.FloatField(default=None, blank=True, null=True)
     data_file = models.FileField(upload_to='uploads/data/', default=None, blank=True, null=True)
+    data_rows = models.IntegerField(default=0)
+    current_data_header = models.CharField(max_length=500, default=None, blank=True, null=True)
 
 
 class NNJobHistory(models.Model):
