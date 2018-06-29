@@ -17,12 +17,20 @@
           </div>
           <textarea class="form-control" aria-label="data_headers" v-model="data_headers"></textarea>
         </div>
+        <template>
+          <Upload 
+            accept=".csv"
+            :data="insert_header_data"
+            :on-success="insertSuccess"
+            action="/NNModelManager/uploadDataForModel/">
+              <br><Button class="btn btn-secondary btn-lg btn-block">Insert Data From CSV</Button>
+          </Upload>
+        </template>
       </template>
       <template v-else>
         <br><p class="text-warning">No data available for this model yet.</p><br>
         <template>
           <Upload
-            multiple
             type="drag"
             accept=".csv"
             :data="upload_header_data"
@@ -84,6 +92,7 @@
       data_rows: null,
       data_headers: null,
       upload_header_data: null,
+      insert_header_data: null,
       json: null,
     },
     delimiters: ["[[","]]"],
@@ -103,6 +112,11 @@
             $this.isModelSelected = true;
             $this.json = response.data;
             $this.upload_header_data = {
+              command: "upload",
+              model_name: response.data.records[0]["model_name"],
+            };
+            $this.insert_header_data = {
+              command: "insert",
               model_name: response.data.records[0]["model_name"],
             };
             if (!response.data.data_headers){
@@ -121,6 +135,11 @@
       },
       uploadSuccess(response, file, fileList){
         alert("success")
+        window.location.reload(true);
+      },
+      insertSuccess(response, file, fileList){
+        alert("success")
+        window.location.reload(true);
       }
     },
     beforeMount(){

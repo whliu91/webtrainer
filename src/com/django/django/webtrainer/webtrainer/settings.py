@@ -154,7 +154,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
+            'handlers': ['file', 'console'],
             'level': 'DEBUG',
             'propagate': True,
         },
@@ -170,3 +170,6 @@ LOGGING = {
         },
     },
 }
+
+# NNModelFilePath
+NN_MODEL_DATA_PATH = os.path.join(BASE_DIR, 'uploads', 'data')

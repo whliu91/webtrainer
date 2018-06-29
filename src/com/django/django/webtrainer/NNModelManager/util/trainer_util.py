@@ -2,6 +2,7 @@ import csv
 from NNModelManager.models import NNModelHistory
 import os
 import logging
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,16 @@ def validDataRecords(model_obj):
     '''
     header_str = model_obj.current_data_header
     data_rows = model_obj.data_rows
-    data_file_path = model_obj.data_file_path
+    if (not model_obj.data_file_path):
+        logger.info("data file does not exist, model: " + model_obj.model_name)
+        model_obj.data_rows = 0
+        model_obj.current_data_header = None
+        model_obj.data_file_path = None
+        model_obj.save()
+        return
+
+    data_file_path = os.path.join(settings.NN_MODEL_DATA_PATH, model_obj.data_file_path)
+    print(data_file_path)
     if (bool(data_file_path) & os.path.exists(data_file_path)):
         logger.info("data file exist, matching content, model: " + model_obj.model_name)
         with open(data_file_path, newline='') as csvfile:
@@ -61,7 +71,7 @@ def acceptNewDataFile(model_name, file_path):
             modelHistory = NNModelHistory.objects.get(model_name=model_name)
             modelHistory.data_rows = count
             modelHistory.current_data_header = header_str
-            modelHistory.data_file_path = file_path
+            modelHistory.data_file_path = os.path.join(model_name, model_name + "_data.csv")
             modelHistory.save()
             logger.info("model data saved, model: " + model_name)
             return True

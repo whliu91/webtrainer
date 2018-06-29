@@ -133,14 +133,20 @@ def acceptDataUpload(request):
         logger.info("POST request from user: " + request.user.email)
         model_name = request.POST["model_name"]
         uploaded_file = request.FILES['file']
-        logger.info("upload request for file: {} and model name: {}".format(uploaded_file.name, model_name))
-        save_path = os.path.join(settings.BASE_DIR, 'uploads\data', model_name)
-        fs = FileSystemStorage(location=save_path)
-        filename = fs.save(uploaded_file.name, uploaded_file)
-        if(trainer_util.acceptNewDataFile(model_name, os.path.join(save_path, uploaded_file.name))):
-            return HttpResponse(1)
-        else:
-            return HttpResponse("unknown")
+        if (request.POST["command"] == "upload"):
+            logger.info("upload request for file: {} and model name: {}".format(uploaded_file.name, model_name))
+            save_path = os.path.join(settings.BASE_DIR, 'uploads\data', model_name)
+            fs = FileSystemStorage(location=save_path)
+            filename = fs.save(model_name + "_data.csv", uploaded_file)
+            if(trainer_util.acceptNewDataFile(model_name, os.path.join(save_path, model_name + "_data.csv"))):
+                return HttpResponse(1)
+            else:
+                return HttpResponse("unknown")
+        
+        elif (request.POST["command"] == "insert"):
+            logger.info("insert request for file: {} and model name: {}".format(uploaded_file.name, model_name))
+            save_path = os.path.join(settings.BASE_DIR, 'uploads\insert_temp', model_name)
+            # TODO implement this in util
 
     logger.error("unknown http request from user: " + request.user.email)
     return HttpResponse("unknown")
