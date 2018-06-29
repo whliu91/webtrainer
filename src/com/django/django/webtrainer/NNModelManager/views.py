@@ -7,21 +7,25 @@ from django.core import serializers
 from datetime import datetime
 from users.models import User
 from NNModelManager.models import NNModelHistory
-from NNModelManager.util.trainer_util import acceptNewDataFile
+from NNModelManager.util import trainer_util
 from django.views.decorators.csrf import csrf_exempt
 from util.DataConversion import QuerySetValuesToDictionOfStrings
 from django.conf import settings
 import os
 from django.core.files.storage import FileSystemStorage
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @csrf_exempt
 def index(request):
     if request.method == 'POST':
+        logger.info("POST request from user: " + request.user.email)
         model_json = json.loads(request.body)
         if (model_json['command'] == "save_json_model"):
             model_user = request.user.email
-            print("[DEBUG] POST: new model save POST request from: " + model_user)
+            logger.info("POST: new model save POST request from: " + model_user)
             model_company = request.user.company
             model_name = model_json['model_name']
             model_num_input = int(model_json['num_input'])
@@ -34,7 +38,7 @@ def index(request):
             os.mkdir(model_data_dir)
             # check model existance
             if NNModelHistory.objects.filter(model_name=model_name).exists():
-                print("[DEBUG] error: model name exists in db")
+                logger.warning("model name exists in db! model: " + model_name)
                 return HttpResponse(1)
             else:
                 # TODO: change these default values to user selected values
@@ -54,11 +58,11 @@ def index(request):
                     min_train_err = None,
                     data_file = None
                 )
-                print("[DEBUG] successfully saved model")
+                logger.info("successfully saved model: " + model_name)
                 return HttpResponse(0)
 
         elif (model_json['command'] == "get_history_model"):
-            print("[DEBUG] query all history models")
+            logger.info("backend query all history models!")
             all_models = NNModelHistory.objects.values(
                 "model_name",
                 "num_layers",
@@ -75,13 +79,13 @@ def index(request):
 
         elif (model_json['command'] == "delete_model"):
             model_name = model_json['model_name']
-            print("[DEBUG] delete model request: " + model_name)
+            logger.info("delete model request, model: " + model_name)
             NNModelHistory.objects.filter(model_name=model_name).delete()
             return HttpResponse("model deleted from database: " + model_name)
         
         elif (model_json['command'] == "user_select_model"):
             model_name = model_json['model_name']
-            print("[DEBUG] select model request: " + model_name)
+            logger.info("select model request, model: " + model_name)
             user_profile_toChange = User.objects.get(email=request.user.email)
             user_profile_toChange.current_selected_model_name = model_name
             user_profile_toChange.save()
@@ -93,13 +97,19 @@ def index(request):
 @csrf_exempt
 def dataManage(request):
     if request.method == 'POST':
+        logger.info("POST request from user: " + request.user.email)
         model_json = json.loads(request.body)
         if (model_json['command'] == "check_model"):
             model = request.user.current_selected_model_name
+            logger.info("check model history data request, model: " + model)
             if not model:
+                logger.warning("no model name provided!")
                 return HttpResponse(1)
             else:
+                logger.info("validation model from history db, model: " + model)
                 target_model_obj = NNModelHistory.objects.get(model_name=model)
+                trainer_util.validDataRecords(target_model_obj)
+                logger.info("validation completed, model: " + model)
                 ret = {
                     "header": "selected model",
                     "result": "success",
@@ -112,7 +122,6 @@ def dataManage(request):
                     "data_headers": target_model_obj.current_data_header,
                     "data_rows": str(target_model_obj.data_rows)
                 }
-                print(target_model_obj.current_data_header)
                 return JsonResponse(ret)
 
     return render(request, 'data_management.html')
@@ -121,17 +130,19 @@ def dataManage(request):
 @csrf_exempt
 def acceptDataUpload(request):
     if request.method == 'POST':
+        logger.info("POST request from user: " + request.user.email)
         model_name = request.POST["model_name"]
         uploaded_file = request.FILES['file']
-        print("[DEBUG] upload request received: " + uploaded_file.name)
-        save_path = os.path.join(settings.BASE_DIR, 'uploads', model_name)
+        logger.info("upload request for file: {} and model name: {}".format(uploaded_file.name, model_name))
+        save_path = os.path.join(settings.BASE_DIR, 'uploads\data', model_name)
         fs = FileSystemStorage(location=save_path)
         filename = fs.save(uploaded_file.name, uploaded_file)
-        if(acceptNewDataFile(model_name, os.path.join(save_path, uploaded_file.name))):
+        if(trainer_util.acceptNewDataFile(model_name, os.path.join(save_path, uploaded_file.name))):
             return HttpResponse(1)
         else:
             return HttpResponse("unknown")
 
+    logger.error("unknown http request from user: " + request.user.email)
     return HttpResponse("unknown")
 
 

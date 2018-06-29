@@ -10,9 +10,13 @@
     <div class="container jumbotron" style="margin-top: 5px">
       <h3>Data</h3>
       <template v-if="isDataAvailable">
-        <br><p class="text-primary">Number of rows of data available: </p>
-        <p class="text-danger">[[data_rows]]</p><br>
-        <Input v-model="data_headers" type="textarea" :rows="4" placeholder="Current Headers"></Input>
+        <br><h6>Number of rows of data available: <span class="badge badge-secondary">[[data_rows]]</span></h6><br>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">Data Headers</span>
+          </div>
+          <textarea class="form-control" aria-label="data_headers" v-model="data_headers"></textarea>
+        </div>
       </template>
       <template v-else>
         <br><p class="text-warning">No data available for this model yet.</p><br>

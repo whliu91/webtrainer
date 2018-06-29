@@ -10,3 +10,5 @@ sqlite
 *.pyc
 # uploads folder
 uploads/
+# local logs
+logs/
