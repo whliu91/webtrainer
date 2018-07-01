@@ -6,6 +6,7 @@ from django.template.response import TemplateResponse
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
+from django.core.urlresolvers import reverse
 
 from .compat import urlsafe_base64_decode
 from .conf import settings

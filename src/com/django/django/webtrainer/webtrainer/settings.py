@@ -173,3 +173,6 @@ LOGGING = {
 
 # NNModelFilePath
 NN_MODEL_DATA_PATH = os.path.join(BASE_DIR, 'uploads', 'data')
+
+# login redirect
+LOGIN_REDIRECT_URL = '/NNModelManager/NNModelHome/'

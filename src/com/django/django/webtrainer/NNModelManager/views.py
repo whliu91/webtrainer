@@ -35,7 +35,7 @@ def index(request):
             model_src_date = datetime.now()
             # create DIR for upload files
             model_data_dir= os.path.join(settings.MEDIA_ROOT, 'uploads', model_name)
-            os.mkdir(model_data_dir)
+            os.makedirs(model_data_dir, exist_ok=True)
             # check model existance
             if NNModelHistory.objects.filter(model_name=model_name).exists():
                 logger.warning("model name exists in db! model: " + model_name)
@@ -56,7 +56,7 @@ def index(request):
                     num_neurons_layer_str = model_num_neuron_layer_str,
                     weights_json = None,
                     min_train_err = None,
-                    data_file = None
+                    data_file_path = None
                 )
                 logger.info("successfully saved model: " + model_name)
                 return HttpResponse(0)
