@@ -2,5 +2,37 @@
 {% load i18n %}
 
 {% block content %}
-<p>{% trans "You are now registered. Activation email sent." %}</p>
+<p>{% trans "You are now registered. Login to continue." %}</p>
+<div id="vuejsblock">
+<h6> You will be redirected to the login page after 
+    <span style="color:red">[[countDown]]</span> secs
+</h6>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+    new Vue({
+      el: '#vuejsblock',
+      data: {
+        countDown: 5
+      },
+      delimiters: ["[[","]]"],
+      methods: {
+        redirectAfterFiveSecs(){
+            if (this.countDown == 0){
+                window.location.href = "/NNModelManager/NNModelHome/";
+            }
+            this.sleep(1000);
+            this.countDown--;
+            this.redirectAfterFiveSecs();
+        },
+        sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms))
+        }
+      },
+      beforeMount(){
+        this.redirectAfterFiveSecs()
+      },
+    });
+  </script>
 {% endblock %}
