@@ -2,5 +2,38 @@
 {% load i18n %}
 
 {% block content %}
-<p>{% trans "Logged out" %}</p>
+<p>{% trans "You are now Logged Out." %}</p>
+<div id="vuejsblock">
+<h6> You will be redirected to the login page after 
+    <span style="color:red">[[countDown]]</span> secs
+</h6>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+    new Vue({
+      el: '#vuejsblock',
+      data: {
+        countDown: 5
+      },
+      delimiters: ["[[","]]"],
+      methods: {
+        redirectAfterFiveSecs(){
+            if (this.countDown == 0){
+                window.location.href = "/";
+            }
+            else{
+                this.sleep(1000);
+                this.countDown--;
+            }
+        },
+        sleep(ms) {
+            setTimeout(this.redirectAfterFiveSecs, ms)
+        }
+      },
+      beforeMount(){
+        this.redirectAfterFiveSecs()
+      },
+    });
+  </script>
 {% endblock %}

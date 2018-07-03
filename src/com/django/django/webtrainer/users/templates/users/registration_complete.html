@@ -20,14 +20,15 @@
       methods: {
         redirectAfterFiveSecs(){
             if (this.countDown == 0){
-                window.location.href = "/NNModelManager/NNModelHome/";
+                window.location.href = "/";
             }
-            this.sleep(1000);
-            this.countDown--;
-            this.redirectAfterFiveSecs();
+            else{
+                this.sleep(1000);
+                this.countDown--;
+            }
         },
         sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms))
+            setTimeout(this.redirectAfterFiveSecs, ms)
         }
       },
       beforeMount(){
