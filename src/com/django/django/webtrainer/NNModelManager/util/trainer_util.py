@@ -1,4 +1,5 @@
 import csv
+import numpy as np
 from NNModelManager.models import NNModelHistory
 import os
 import logging
@@ -31,14 +32,10 @@ def validDataRecords(model_obj):
             count = 0
             for line in spamreader:
                 count += 1
-                if count == 1:
-                    header_row = line
-            count = count - 1
-            header_str_ref = ','.join(header_row)
+
         if (data_rows != count):
             model_obj.data_rows = count
-        if (header_str != header_str_ref):
-            model_obj.current_data_header = header_str_ref
+
         model_obj.save()
         logger.info("validate completed, model: " + model_obj.model_name)
         return True
@@ -52,32 +49,87 @@ def validDataRecords(model_obj):
         return False
 
 
-def acceptNewDataFile(model_name, file_path):
+def acceptNewDataFile(model_name, temp_file_path):
     '''
     Accept a new data file for a model that has no previous record
     '''
     logger.info("new data file created for model: " + model_name)
-    with open(file_path, newline='') as csvfile:
+    with open(temp_file_path, newline='') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',')
-        count = 0
+        temp_lst = []
         for line in spamreader:
-            count += 1
-            if count == 1:
-                header_row = line
-        count = count - 1
+            temp_lst.append(line)
+        # sort list by header
+        temp_lst = sortListByFirstRow(temp_lst)
+        data_lst = temp_lst[1:]
+        count = len(data_lst)
         if count > 0:
-            logger.info("")
-            header_str = ','.join(header_row)
-            modelHistory = NNModelHistory.objects.get(model_name=model_name)
-            modelHistory.data_rows = count
-            modelHistory.current_data_header = header_str
-            modelHistory.data_file_path = os.path.join(model_name, model_name + "_data.csv")
-            modelHistory.save()
-            logger.info("model data saved, model: " + model_name)
-            return True
+            data_file_path = os.path.join('uploads\\data', model_name, model_name + "_data.csv")
+            if appendToCsvFile(data_file_path, data_lst):
+                header_str = ','.join(temp_lst[0])
+                print(header_str)
+                modelHistory = NNModelHistory.objects.get(model_name=model_name)
+                modelHistory.data_rows = count
+                modelHistory.current_data_header = header_str
+                modelHistory.data_file_path = os.path.join(model_name, model_name + "_data.csv")
+                modelHistory.save()
+                logger.info("model data saved, model: " + model_name)
+                return True
         else:
             logger.warning("new data file contains 0 rows!, model: " + model_name)
             return False
     
     logger.error("cannot open data file! for file: " + file_path)
+    return False
+
+def acceptNewInsert(model_name, temp_file_path):
+    logger.info("new data insertation for model: " + model_name)
+    target_model_obj = NNModelHistory.objects.get(model_name=model_name)
+    current_data_header = target_model_obj.current_data_header
+    current_count = target_model_obj.data_rows
+    with open(temp_file_path, newline='') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=',')
+        temp_list = []
+        for line in spamreader:
+            temp_list.append(line)
+        temp_list = sortListByFirstRow(temp_list)
+        data_list = temp_list[1:]
+        header_str = ','.join(temp_list[0])
+        count = len(data_list)
+        if (count > 0) & (header_str == current_data_header):
+            data_file_path = os.path.join('uploads\\data', model_name, model_name + "_data.csv")
+            if appendToCsvFile(data_file_path, data_list):
+                target_model_obj.data_rows = current_count + count
+                target_model_obj.save()
+                logger.info("insertation success, model: " + model_name)
+                return True
+        else:
+            logger.error("header of insert file does not match previous file!")
+    
+    return False
+
+def sortListByFirstRow(lst):
+    '''
+    Assume the first row of a list is header, and sort the columns of the list by
+    header, return the sorted list.
+    '''
+    data = np.array(lst)
+    data = data[:, np.argsort(data[0])]
+    lst = list(data)
+    ret = []
+    for item in lst:
+        ret.append(list(item))
+
+    return ret
+
+def appendToCsvFile(filename, lst):
+    '''
+    Append new line to old csv, check header matching before calling this
+    function
+    '''
+    with open(filename, 'a', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(lst)
+        return True
+    
     return False

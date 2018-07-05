@@ -10,6 +10,7 @@ from NNModelManager.models import NNModelHistory
 from NNModelManager.util import trainer_util
 from django.views.decorators.csrf import csrf_exempt
 from util.DataConversion import QuerySetValuesToDictionOfStrings
+
 from django.conf import settings
 import os
 from django.core.files.storage import FileSystemStorage
@@ -135,18 +136,30 @@ def acceptDataUpload(request):
         uploaded_file = request.FILES['file']
         if (request.POST["command"] == "upload"):
             logger.info("upload request for file: {} and model name: {}".format(uploaded_file.name, model_name))
-            save_path = os.path.join(settings.BASE_DIR, 'uploads\data', model_name)
+            save_path = os.path.join(settings.BASE_DIR, 'uploads\\temp', model_name)
+            final_path = os.path.join(settings.BASE_DIR, 'uploads\\data', model_name)
             fs = FileSystemStorage(location=save_path)
             filename = fs.save(model_name + "_data.csv", uploaded_file)
-            if(trainer_util.acceptNewDataFile(model_name, os.path.join(save_path, model_name + "_data.csv"))):
+            if not os.path.exists(final_path):
+                os.makedirs(final_path)
+            if(trainer_util.acceptNewDataFile(model_name, os.path.join(save_path, filename))):
+                os.remove(os.path.join(save_path, filename))
                 return HttpResponse(1)
             else:
+                os.remove(os.path.join(save_path, filename))
                 return HttpResponse("unknown")
         
         elif (request.POST["command"] == "insert"):
             logger.info("insert request for file: {} and model name: {}".format(uploaded_file.name, model_name))
-            save_path = os.path.join(settings.BASE_DIR, 'uploads\insert_temp', model_name)
-            # TODO implement this in util
+            save_path = os.path.join(settings.BASE_DIR, 'uploads\\temp', model_name)
+            fs = FileSystemStorage(location=save_path)
+            filename = fs.save(model_name + "_data.csv", uploaded_file)
+            if(trainer_util.acceptNewInsert(model_name, os.path.join(save_path, filename))):
+                os.remove(os.path.join(save_path, filename))
+                return HttpResponse(1)
+            else:
+                os.remove(os.path.join(save_path, filename))
+                return HttpResponse("unknown")
 
     logger.error("unknown http request from user: " + request.user.email)
     return HttpResponse("unknown")
