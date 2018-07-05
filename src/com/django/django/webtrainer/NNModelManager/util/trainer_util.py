@@ -24,7 +24,6 @@ def validDataRecords(model_obj):
         return
 
     data_file_path = os.path.join(settings.NN_MODEL_DATA_PATH, model_obj.data_file_path)
-    print(data_file_path)
     if (bool(data_file_path) & os.path.exists(data_file_path)):
         logger.info("data file exist, matching content, model: " + model_obj.model_name)
         with open(data_file_path, newline='') as csvfile:
@@ -67,7 +66,6 @@ def acceptNewDataFile(model_name, temp_file_path):
             data_file_path = os.path.join('uploads\\data', model_name, model_name + "_data.csv")
             if appendToCsvFile(data_file_path, data_lst):
                 header_str = ','.join(temp_lst[0])
-                print(header_str)
                 modelHistory = NNModelHistory.objects.get(model_name=model_name)
                 modelHistory.data_rows = count
                 modelHistory.current_data_header = header_str
@@ -83,6 +81,9 @@ def acceptNewDataFile(model_name, temp_file_path):
     return False
 
 def acceptNewInsert(model_name, temp_file_path):
+    '''
+    Accept a new inserted data file with comparison on the header first
+    '''
     logger.info("new data insertation for model: " + model_name)
     target_model_obj = NNModelHistory.objects.get(model_name=model_name)
     current_data_header = target_model_obj.current_data_header

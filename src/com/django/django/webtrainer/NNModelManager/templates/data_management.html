@@ -26,6 +26,13 @@
               <br><Button class="btn btn-secondary btn-lg btn-block">Insert Data From CSV</Button>
           </Upload>
         </template>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">Target Header</span>
+          </div>
+          <textarea class="form-control" aria-label="target_header" v-model="target_header"></textarea>
+          <Button class="btn btn-secondary" style="margin-left: 10px">Apply</Button>
+        </div>
       </template>
       <template v-else>
         <br><p class="text-warning">No data available for this model yet.</p><br>
