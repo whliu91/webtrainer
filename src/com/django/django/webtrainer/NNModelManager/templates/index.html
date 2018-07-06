@@ -454,7 +454,7 @@
                 optimise_function: optimFuncDic[this.optimFuncAO]
             };
             data_to_send = JSON.stringify(data_to_send);
-            console.log(data_to_send);
+            var $this = this;
             axios.post('/NNModelManager/NNModelHome/',
                     data_to_send)
                     .then(function(response){
@@ -465,7 +465,8 @@
                       }
                       else
                       {
-                        // TODO: redirect to model view 
+                        $this.shouldCreateNewModel = false;
+                        location.reload();
                       }
                     })
                     .catch(function(error){

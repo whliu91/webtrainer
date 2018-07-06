@@ -30,8 +30,8 @@
           <div class="input-group-prepend">
             <span class="input-group-text">Target Header</span>
           </div>
-          <textarea class="form-control" aria-label="target_header" v-model="target_header"></textarea>
-          <Button class="btn btn-secondary" style="margin-left: 10px">Apply</Button>
+          <textarea class="form-control" aria-label="target_col_name" v-model="target_col_name"></textarea>
+          <Button @click="changeTargetCol" class="btn btn-secondary" style="margin-left: 10px">Apply</Button>
         </div>
       </template>
       <template v-else>
@@ -100,6 +100,7 @@
       data_headers: null,
       upload_header_data: null,
       insert_header_data: null,
+      target_col_name: null,
       json: null,
     },
     delimiters: ["[[","]]"],
@@ -133,12 +134,42 @@
               $this.isDataAvailable = true;
               $this.data_rows = response.data.data_rows;
               $this.data_headers = response.data.data_headers;
+              console.log(response.data.target_col_name)
+              $this.target_col_name = response.data.target_col_name;
             }
           }
         })
         .catch(function(error){
           console.log(error);
         });
+      },
+      changeTargetCol(){
+        var $this = this;
+        data_to_send = {
+            command: "change_target_col",
+            target_col_name: $this.target_col_name
+        };
+        axios.post(
+            '/NNModelManager/dataManage/',
+            data_to_send
+        )
+        .then(function(response){
+          result = response.data;
+          switch(result){
+            case 0:
+              alert("succeed");
+              location.reload();
+              break;
+            case 1:
+              alert("no model name provided");
+              break;
+            case 2:
+              alert("this column does not exist, make sure you pick one from header list");
+              break;
+            default:
+              alert("unknown response from server")
+          }
+        })
       },
       uploadSuccess(response, file, fileList){
         alert("success")
@@ -147,7 +178,7 @@
       insertSuccess(response, file, fileList){
         alert("success")
         window.location.reload(true);
-      }
+      },
     },
     beforeMount(){
       this.checkModel()

@@ -121,9 +121,31 @@ def dataManage(request):
                         "input_size": str(target_model_obj.input_size),
                     }],
                     "data_headers": target_model_obj.current_data_header,
+                    "target_col_name": target_model_obj.target_col_name,
                     "data_rows": str(target_model_obj.data_rows)
                 }
                 return JsonResponse(ret)
+            
+        elif (model_json['command'] == "change_target_col"):
+            model = request.user.current_selected_model_name
+            logger.info("change target column name request, model: " + model)
+            if not model:
+                logger.warning("no model name provided!")
+                return HttpResponse(1)
+            else:
+                logger.info("validation model from history db, model: " + model)
+                target_model_obj = NNModelHistory.objects.get(model_name=model)
+                current_data_header = target_model_obj.current_data_header
+                header_list = current_data_header.split(',')
+                target_col_name = model_json['target_col_name']
+                if target_col_name in current_data_header:
+                    target_model_obj.target_col_name = target_col_name
+                    target_model_obj.save()
+                    logger.info("changed target column: " + target_col_name)
+                    return HttpResponse(0)
+                else:
+                    logger.error("col does not exist: " + target_col_name)
+                    return HttpResponse(2)
 
     return render(request, 'data_management.html')
 

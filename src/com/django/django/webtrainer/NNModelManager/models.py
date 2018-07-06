@@ -33,6 +33,7 @@ class NNModelHistory(models.Model):
     data_file_path = models.FilePathField(path=settings.NN_MODEL_DATA_PATH, default=None, blank=True, null=True)
     data_rows = models.IntegerField(default=0)
     current_data_header = models.CharField(max_length=500, default=None, blank=True, null=True)
+    target_col_name = models.CharField(max_length=50, default=None, blank=True, null=True)
 
 
 class NNJobHistory(models.Model):

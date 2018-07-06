@@ -8,6 +8,9 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
+# TODO: data related process will be time consuming, consider migrate
+# to Celery when it is deployed.
+
 def validDataRecords(model_obj):
     '''
     Validate data record, try to match file content and db
