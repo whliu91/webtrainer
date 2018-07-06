@@ -1,15 +1,107 @@
 {% extends 'index.html' %}
 {% block content %}
-<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Operations</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-      <div class="btn-group mr-2">
-
-      </div>
-    </div>
+<h1>Operations</h1>
+<div id="vuejsblock">
+  <div class="container jumbotron" style="margin-top: 5px">
+    <template v-if="isReadyForTraining">
+      <template v-if="isJobRunning">
+        <h2>There is a job running, please wait...</h2><br>
+        <div class="progress">
+          <div
+            id="training-progress-bar"
+            class="progress-bar progress-bar-striped progress-bar-animated"
+            role="progressbar"
+            aria-valuenow="0"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            style="width: 100%">
+          </div>
+        </div>
+      </template>
+      <template v-else>
+        <h2>There is currently no job running for this user</h2><br>
+        <p style="font-size: 20px"> You can submit a job on the selected dataset by clicking: </p>
+        <button @click="submitJob" class="btn btn-secondary btn-lg btn-block">SUBMIT A TRAINING JOB</button>
+      </template>
+    </template>
+    <template v-else>
+        <br>
+        <p style="font-size: 20px">One of the following criteria has not been met:<br>
+            1. Model is selected<br>
+            2. Model has data available<br>
+            3. Model has target column selected</p>
+        <br>
+        <a href='/NNModelManager/NNModelHome/' class="btn btn-secondary btn-lg btn-block">SELECT OR CREATE A MODEL</a>
+    </template>
   </div>
-</main>
+</div>
 {% endblock %}
 {% block js %}
+<script>
+  new Vue({
+    el: '#vuejsblock',
+    data: {
+      isReadyForTraining: false,
+      isJobRunning: false,
+    },
+    delimiters: ["[[","]]"],
+    methods: {
+      submitJob(){
+        var $this = this;
+        data_to_send = {
+            command: "submit_job",
+        };
+        axios.post(
+            '/NNModelManager/Operations/',
+            data_to_send
+        )
+        .then(function(response){
+          alert("Job successfully submitted!");
+          window.location.reload();
+        })
+        .catch(function(error){
+          console.log(error);
+        });
+      },
+      updateProgress(progress){
+        var pb = document.getElementById("training-progress-bar");
+        pb.setAttribute("style", "width: " + progress + "%");
+      },
+      checkModel(){
+        var $this = this;
+        data_to_send = {
+            command: "check_model",
+        };
+        axios.post(
+            '/NNModelManager/dataManage/',
+            data_to_send
+        )
+        .then(function(response){
+          console.log("Selected data: " + response.data.records[0]["model_name"]);
+          if (response.data != 0){
+            if(
+              response.data.data_headers &&
+              response.data.data_rows &&
+              response.data.target_col_name
+            ){
+              console.log("ready for training confirmed");
+              $this.isReadyForTraining = true;
+            }
+            else{
+              console.log("one of the property is missing");
+              console.log(response.data)
+              $this.isReadyForTraining = false;
+            }
+          }
+        })
+        .catch(function(error){
+          console.log(error);
+        });
+      },
+    },
+    beforeMount(){
+      this.checkModel();
+    },
+  });
+</script>
 {% endblock %}

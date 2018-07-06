@@ -137,3 +137,9 @@ def appendToCsvFile(filename, lst):
         return True
     
     return False
+
+def submitTrainingJob(model_name):
+    '''
+    Submit a training job for the selected model
+    '''
+    return True
