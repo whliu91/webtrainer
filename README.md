@@ -18,4 +18,4 @@ For developers who is working on or want to contribute to the project. The web a
 *Celery 3.1.18 - From Celery 3.1 onwards, django-celery connector is not required* <br />
 *Tensorflow 1.8 - latest at development time* <br />
 *Keras 2.2.0 - Deep Learning framework on top of Tensorflow* <br />
-*matplotlib 2.2.2 - For drawing NN model*
+*matplotlib 2.2.2 - For drawing NN model Note: in Unix like system for Matplotlib to run, it is probably required to build tkinter independently with the following command “sudo apt-get install python3-tk”* <br />

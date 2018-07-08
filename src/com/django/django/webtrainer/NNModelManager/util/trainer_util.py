@@ -1,6 +1,7 @@
 import csv
 import numpy as np
 from NNModelManager.models import NNModelHistory
+from NNModelManager.util import plotNN
 import os
 import logging
 from django.conf import settings
@@ -66,7 +67,7 @@ def acceptNewDataFile(model_name, temp_file_path):
         data_lst = temp_lst[1:]
         count = len(data_lst)
         if count > 0:
-            data_file_path = os.path.join('uploads\\data', model_name, model_name + "_data.csv")
+            data_file_path = os.path.join('uploads', 'data', model_name, model_name + "_data.csv")
             if appendToCsvFile(data_file_path, data_lst):
                 header_str = ','.join(temp_lst[0])
                 modelHistory = NNModelHistory.objects.get(model_name=model_name)
@@ -101,7 +102,7 @@ def acceptNewInsert(model_name, temp_file_path):
         header_str = ','.join(temp_list[0])
         count = len(data_list)
         if (count > 0) & (header_str == current_data_header):
-            data_file_path = os.path.join('uploads\\data', model_name, model_name + "_data.csv")
+            data_file_path = os.path.join('uploads', 'data', model_name, model_name + "_data.csv")
             if appendToCsvFile(data_file_path, data_list):
                 target_model_obj.data_rows = current_count + count
                 target_model_obj.save()
@@ -137,6 +138,30 @@ def appendToCsvFile(filename, lst):
         return True
     
     return False
+
+
+def getModelStruct(model_name):
+    '''
+    Create png for model structure for a specific model
+    Return the path to the created file.
+    '''
+    target_model_obj = NNModelHistory.objects.get(model_name=model_name)
+    num_neurons = target_model_obj.num_neurons_layer_str
+    num_neurons_arr = [int(item) for item in num_neurons.split(",")]
+    model_param = [target_model_obj.input_size] + num_neurons_arr + [1]
+    # model path
+    base_path = os.path.join(settings.BASE_DIR, 'figures', model_name)
+    if not os.path.exists(base_path):
+        os.makedirs(base_path)
+
+    model_struct_img_path = os.path.join(base_path, model_name + '.png')
+    if os.path.exists(model_struct_img_path):
+        os.remove(model_struct_img_path)
+
+    network = plotNN.DrawNN(model_param)
+    network.draw(model_struct_img_path)
+    return model_struct_img_path
+
 
 def submitTrainingJob(model_name):
     '''

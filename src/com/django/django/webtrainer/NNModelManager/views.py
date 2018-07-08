@@ -15,6 +15,7 @@ from django.conf import settings
 import os
 from django.core.files.storage import FileSystemStorage
 import logging
+import base64
 
 logger = logging.getLogger(__name__)
 
@@ -158,8 +159,8 @@ def acceptDataUpload(request):
         uploaded_file = request.FILES['file']
         if (request.POST["command"] == "upload"):
             logger.info("upload request for file: {} and model name: {}".format(uploaded_file.name, model_name))
-            save_path = os.path.join(settings.BASE_DIR, 'uploads\\temp', model_name)
-            final_path = os.path.join(settings.BASE_DIR, 'uploads\\data', model_name)
+            save_path = os.path.join(settings.BASE_DIR, "uploads", "temp", model_name)
+            final_path = os.path.join(settings.BASE_DIR, "uploads", "data", model_name)
             fs = FileSystemStorage(location=save_path)
             filename = fs.save(model_name + "_data.csv", uploaded_file)
             if not os.path.exists(final_path):
@@ -173,7 +174,7 @@ def acceptDataUpload(request):
         
         elif (request.POST["command"] == "insert"):
             logger.info("insert request for file: {} and model name: {}".format(uploaded_file.name, model_name))
-            save_path = os.path.join(settings.BASE_DIR, 'uploads\\temp', model_name)
+            save_path = os.path.join(settings.BASE_DIR, "uploads", "temp", model_name)
             fs = FileSystemStorage(location=save_path)
             filename = fs.save(model_name + "_data.csv", uploaded_file)
             if(trainer_util.acceptNewInsert(model_name, os.path.join(save_path, filename))):
@@ -191,7 +192,8 @@ def acceptDataUpload(request):
 def operations(request):
     if request.method == 'POST':
         logger.info("POST request from user: " + request.user.email)
-        if (request.POST["command"] == "submit_job"):
+        model_json = json.loads(request.body)
+        if (model_json['command'] == "submit_job"):
             model_name = request.user.current_selected_model_name
             logger.info("Training request for model: " + model_name)
             success = trainer_util.submitTrainingJob(model_name)
@@ -201,5 +203,19 @@ def operations(request):
             else:
                 logger.error("submit request failed")
                 return HttpResponse(1)
+        
+        elif (model_json['command'] == "show_struct"):
+            model_name = request.user.current_selected_model_name
+            logger.info("Show struct request for model: " + model_name)
+            img_path = trainer_util.getModelStruct(model_name)
+            try:
+                with open(img_path, "rb") as f:
+                    str_res = base64.b64encode(f.read())
+                    return HttpResponse(str_res, content_type="image/png")
+            except IOError:
+                red = Image.new('RGBA', (1, 1), (255,0,0,0))
+                response = HttpResponse(content_type="image/png")
+                red.save(response, "PNG")
+                return response
 
     return render(request, 'operations.html')

@@ -20,8 +20,14 @@
       </template>
       <template v-else>
         <h2>There is currently no job running for this user</h2><br>
-        <p style="font-size: 20px"> You can submit a job on the selected dataset by clicking: </p>
+        <p style="font-size: 20px"> You can submit a job on the selected dataset by clicking: </p><br>
         <button @click="submitJob" class="btn btn-secondary btn-lg btn-block">SUBMIT A TRAINING JOB</button>
+        <br><p style="font-size: 20px"> You can view the model structure by clicking: </p><br>
+        <button @click="showStruct" class="btn btn-secondary btn-lg btn-block">SHOW MODEL STRUCTURE</button>
+        <template v-if="shouldShowStructure">
+          <br><p style="font-size: 20px"> Model Architechture: </p><br>
+          <img :src="struct_png" class="img-fluid" alt="Responsive image" style="border-style: ridge">
+        </template>
       </template>
     </template>
     <template v-else>
@@ -43,6 +49,8 @@
     data: {
       isReadyForTraining: false,
       isJobRunning: false,
+      shouldShowStructure: false,
+      struct_png:null
     },
     delimiters: ["[[","]]"],
     methods: {
@@ -66,6 +74,29 @@
       updateProgress(progress){
         var pb = document.getElementById("training-progress-bar");
         pb.setAttribute("style", "width: " + progress + "%");
+      },
+      showStruct(){
+        var $this = this;
+        data_to_send = {
+            command: "show_struct",
+        };
+        axios.post(
+            '/NNModelManager/Operations/',
+            data_to_send
+        )
+        .then(function(response){
+          console.log(response);
+          $this.shouldShowStructure = true;
+          var b64Response = $this.hexToBase64(response.data);
+          $this.struct_png = 'data:image/png;base64,' + response.data;
+        })
+        .catch(function(error){
+          console.log(error);
+          $this.shouldShowStructure = false;
+        });
+      },
+      hexToBase64(str) {
+          return btoa(String.fromCharCode.apply(null, str.replace(/\r|\n/g, "").replace(/([\da-fA-F]{2}) ?/g, "0x$1 ").replace(/ +$/, "").split(" ")));
       },
       checkModel(){
         var $this = this;

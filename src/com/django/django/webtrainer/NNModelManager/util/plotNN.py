@@ -1,6 +1,8 @@
+import matplotlib
 from matplotlib import pyplot
 from math import cos, sin, atan
 
+matplotlib.use('SVG')
 
 class Neuron():
     def __init__(self, x, y):
@@ -89,19 +91,16 @@ class NeuralNetwork():
         pyplot.axis('off')
         pyplot.title( 'Neural Network architecture', fontsize=15 )
         pyplot.savefig(savepath)
+        # close all ref to avoid crash
+        pyplot.close('all')
 
 class DrawNN():
-    def __init__( self, neural_network, savepath):
+    def __init__( self, neural_network):
         self.neural_network = neural_network
 
-    def draw( self ):
+    def draw( self, savepath ):
         widest_layer = max( self.neural_network )
         network = NeuralNetwork( widest_layer )
         for l in self.neural_network:
             network.add_layer(l)
         network.draw(savepath)
-
-''' Usage:
-network = DrawNN([2, 8, 8, 1])
-network.draw("path/xxx.png")
-'''
