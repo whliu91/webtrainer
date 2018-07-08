@@ -1,7 +1,9 @@
 import csv
 import numpy as np
-from NNModelManager.models import NNModelHistory
-from NNModelManager.util import plotNN
+from NNModelManager.models import NNModelHistory, NNJobHistory
+from NNModelManager.util import plotNN, async_task
+from datetime import datetime
+from util import DataConversion
 import os
 import logging
 from django.conf import settings
@@ -163,8 +165,18 @@ def getModelStruct(model_name):
     return model_struct_img_path
 
 
-def submitTrainingJob(model_name):
+def submitTrainingJob(model_name, user_obj):
     '''
     Submit a training job for the selected model
     '''
+    job_id = DataConversion.removeCharFromEmail(user_obj.email) + datetime.now().strftime('%Y%m%d_%H%M%S')
+    job_obj = NNJobHistory.objects.Create(
+        job_id = job_id,
+        job_start_time = datetime.now(),
+        job_status = 'RUNNING',
+        user_created = user_obj.email
+    )
+    user_obj.current_running_job_id = job_id
+    user_obj.save()
+    async_task.trainNetworkByName(NNModelHistory.objects.get(model_name=model_name), job_id)
     return True

@@ -41,13 +41,12 @@ class NNJobHistory(models.Model):
     Database for all jobs created by users
     '''
     JOB_STATUS_CHOICES = (
-        ('SUBMITTED', 'SUBMITTED'),
         ('RUNNING', 'RUNNING'),
         ('FAILED', 'FAILED'),
         ('SUCCEED', 'SUCCEED'),
     )
     job_id = models.CharField(max_length=50)
     job_start_time = models.DateTimeField()
-    job_end_time = models.DateTimeField()
+    job_end_time = models.DateTimeField(default=None, blank=True, null=True)
     job_status = models.CharField(max_length=50, choices=JOB_STATUS_CHOICES)
     user_created = models.CharField(max_length=50)

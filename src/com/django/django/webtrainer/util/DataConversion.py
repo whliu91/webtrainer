@@ -14,3 +14,7 @@ def QuerySetValuesToDictionOfStrings(querySet):
                 row_dict[key] = str(value)
     
     return querySet_list
+
+
+def removeCharFromEmail(email):
+    return email.replace('@', 'at').replace('.', 'dot')

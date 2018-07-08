@@ -196,7 +196,7 @@ def operations(request):
         if (model_json['command'] == "submit_job"):
             model_name = request.user.current_selected_model_name
             logger.info("Training request for model: " + model_name)
-            success = trainer_util.submitTrainingJob(model_name)
+            success = trainer_util.submitTrainingJob(model_name, request.user)
             if success:
                 logger.info("submit request succeed")
                 return HttpResponse(0)
