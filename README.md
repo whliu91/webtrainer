@@ -30,6 +30,8 @@ For developers who is working on or want to contribute to the project. The web a
 
 **Tensorflow 1.8**
 - latest at development time, probably worthwile to investigate in installing GPU version of Tensorflow
+- Tensorflow is not the only backend option, for example, if you are looking into deploy the project under a 32 bit
+OS, you might want to use Theano instead.
 
 **Keras 2.2.0**
 - Deep Learning framework on top of Tensorflow

@@ -1,8 +1,8 @@
 import matplotlib
+matplotlib.use('Agg')
 from matplotlib import pyplot
 from math import cos, sin, atan
 
-matplotlib.use('SVG')
 
 class Neuron():
     def __init__(self, x, y):
