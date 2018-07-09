@@ -3,6 +3,13 @@
 <h1>Operations</h1>
 <div id="vuejsblock">
   <div class="container jumbotron" style="margin-top: 5px">
+    <template v-if="isPreviousTrainingResultAvailable">
+      <h2>Previous Job Result </h2><br>
+      <p style="font-size: 20px">
+        1. model name: [[model_name]]<br>
+        2. min error: [[min_err]]<br>
+        3. export weights json: [[weights]]</p>
+    </template>
     <template v-if="isReadyForTraining">
       <template v-if="isJobRunning">
         <h2>There is a job running, please wait...</h2><br>
@@ -48,9 +55,13 @@
     el: '#vuejsblock',
     data: {
       isReadyForTraining: false,
+      isPreviousTrainingResultAvailable: false,
       isJobRunning: false,
       shouldShowStructure: false,
-      struct_png:null
+      struct_png: null,
+      model_name: null,
+      min_err: null,
+      weights: null
     },
     delimiters: ["[[","]]"],
     methods: {
@@ -87,16 +98,12 @@
         .then(function(response){
           console.log(response);
           $this.shouldShowStructure = true;
-          var b64Response = $this.hexToBase64(response.data);
           $this.struct_png = 'data:image/png;base64,' + response.data;
         })
         .catch(function(error){
           console.log(error);
           $this.shouldShowStructure = false;
         });
-      },
-      hexToBase64(str) {
-          return btoa(String.fromCharCode.apply(null, str.replace(/\r|\n/g, "").replace(/([\da-fA-F]{2}) ?/g, "0x$1 ").replace(/ +$/, "").split(" ")));
       },
       checkModel(){
         var $this = this;
@@ -115,6 +122,11 @@
               response.data.data_rows &&
               response.data.target_col_name
             ){
+              if (response.data.weights_json){
+                $this.weights = response.data.weights_json;
+                $this.min_err = response.data.min_train_err;
+                $this.isPreviousTrainingResultAvailable = true;
+              }
               console.log("ready for training confirmed");
               $this.isReadyForTraining = true;
             }
@@ -123,6 +135,25 @@
               console.log(response.data)
               $this.isReadyForTraining = false;
             }
+          }
+        })
+        .catch(function(error){
+          console.log(error);
+        });
+        data_to_send = {
+            command: "check_job_status",
+        };
+        axios.post(
+            '/NNModelManager/Operations/',
+            data_to_send
+        )
+        .then(function(response){
+          console.log(response);
+          if(response.data == 1){
+            $this.isJobRunning = false;
+          }
+          else{
+            $this.isJobRunning = true;
           }
         })
         .catch(function(error){

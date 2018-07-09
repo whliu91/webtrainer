@@ -1,4 +1,6 @@
+# Draw NN Architechture and save the figure in the project folder
 import matplotlib
+# set the matplotlib to use agg before importing pyplot to avoid threading problems
 matplotlib.use('Agg')
 from matplotlib import pyplot
 from math import cos, sin, atan

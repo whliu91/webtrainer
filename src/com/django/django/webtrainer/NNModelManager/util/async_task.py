@@ -19,7 +19,7 @@ def trainNetworkByName(model_obj, job_id):
     '''
     # read params
     num_layers = model_obj.num_layers
-    layer_neurons = model_obj.num_neurons_layer_str.split(',')
+    layer_neurons = [int(item) for item in model_obj.num_neurons_layer_str.split(",")]
     b_size = model_obj.batch_size
     optim = model_obj.optim_func
     loss = model_obj.loss_func
@@ -56,5 +56,5 @@ def trainNetworkByName(model_obj, job_id):
     model_obj.weights_json = weights_json
     model_obj.min_train_err = min_error
     model_obj.save()
-    task_callbacks.onTrainingCompeted(job_id, True)
+    task_callbacks.onTrainingCompeted(job_id, True, weights_json)
 

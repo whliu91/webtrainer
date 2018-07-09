@@ -6,7 +6,7 @@ import json
 from django.core import serializers
 from datetime import datetime
 from users.models import User
-from NNModelManager.models import NNModelHistory
+from NNModelManager.models import NNModelHistory, NNJobHistory
 from NNModelManager.util import trainer_util
 from django.views.decorators.csrf import csrf_exempt
 from util.DataConversion import QuerySetValuesToDictionOfStrings
@@ -33,7 +33,7 @@ def index(request):
             model_num_input = int(model_json['num_input'])
             model_num_layers = int(model_json['num_layers'])
             model_num_neuron_layer_str = model_json['num_neuron_layer_str']
-            model_optim_func = model_json['optimise_function']
+            model_loss_func = model_json['loss_function']
             model_src_date = datetime.now()
             # create DIR for upload files
             model_data_dir= os.path.join(settings.MEDIA_ROOT, 'uploads', model_name)
@@ -51,8 +51,8 @@ def index(request):
                     model_name = model_name,
                     input_size = model_num_input,
                     batch_size = 32,
-                    optim_func = model_optim_func,
-                    loss_func = 'adam',
+                    optim_func = 'adam',
+                    loss_func = model_loss_func,
                     epoch_size = 1000,
                     num_layers = model_num_layers,
                     num_neurons_layer_str = model_num_neuron_layer_str,
@@ -123,7 +123,9 @@ def dataManage(request):
                     }],
                     "data_headers": target_model_obj.current_data_header,
                     "target_col_name": target_model_obj.target_col_name,
-                    "data_rows": str(target_model_obj.data_rows)
+                    "data_rows": str(target_model_obj.data_rows),
+                    "weights_json": target_model_obj.weights_json,
+                    "min_train_err": str(target_model_obj.min_train_err)
                 }
                 return JsonResponse(ret)
             
@@ -217,5 +219,16 @@ def operations(request):
                 response = HttpResponse(content_type="image/png")
                 red.save(response, "PNG")
                 return response
+        
+        elif (model_json['command'] == "check_job_status"):
+            job_id = request.user.current_running_job_id
+            if not job_id:
+                return HttpResponse('1')
+            logger.info("check status for job: " + job_id)
+            job_obj = NNJobHistory.objects.get(job_id=job_id)
+            if job_obj.status == 'SUCCEED':
+                return HttpResponse('1')
+            else:
+                return HttpResponse('0')
 
     return render(request, 'operations.html')

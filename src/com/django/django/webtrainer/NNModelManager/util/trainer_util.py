@@ -170,11 +170,12 @@ def submitTrainingJob(model_name, user_obj):
     Submit a training job for the selected model
     '''
     job_id = DataConversion.removeCharFromEmail(user_obj.email) + datetime.now().strftime('%Y%m%d_%H%M%S')
-    job_obj = NNJobHistory.objects.Create(
+    job_obj = NNJobHistory.objects.create(
         job_id = job_id,
         job_start_time = datetime.now(),
         job_status = 'RUNNING',
-        user_created = user_obj.email
+        user_created = user_obj.email,
+        model_name = model_name
     )
     user_obj.current_running_job_id = job_id
     user_obj.save()

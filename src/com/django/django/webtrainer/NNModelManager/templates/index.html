@@ -112,9 +112,9 @@
                 <template v-if="shouldShowMoreConfig">
                   <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                      <label class="input-group-text" for="optimFuncAO" style="width: 200px">Optimise functions</label>
+                      <label class="input-group-text" for="lossFuncAO" style="width: 200px">loss functions</label>
                     </div>
-                    <select class="custom-select" v-model="optimFuncAO">
+                    <select class="custom-select" v-model="lossFuncAO">
                       <option selected>Choose...</option>
                       <option value="1">mape</option>
                       <option value="2">mse</option>
@@ -351,7 +351,7 @@
           numInputAO: "",
           numLayersAO: "",
           numNeuronsPerLayersAO: "",
-          optimFuncAO: "",
+          lossFuncAO: "",
           errorMessage: "unknown error",
           loadComplete: false,
           json: null
@@ -434,14 +434,14 @@
             return this.shouldShowMoreConfig = true
           },
           saveNewModel: function(){
-            var optimFuncDic = {
+            var lossFuncDic = {
               "1": "mape",
               "2": "mse",
               "3": "mae"
             }
-            if (!optimFuncDic.hasOwnProperty(this.optimFuncAO))
+            if (!lossFuncDic.hasOwnProperty(this.lossFuncAO))
             {
-              this.errorMessage = "invalid selection on optimise function";
+              this.errorMessage = "invalid selection on loss function";
               return this.shouldShowErrorMessage = true;
             }
             this.shouldShowErrorMessage = false;
@@ -451,7 +451,7 @@
                 num_input: this.numInputAO,
                 num_layers: this.numLayersAO,
                 num_neuron_layer_str: this.numNeuronsPerLayersAO,
-                optimise_function: optimFuncDic[this.optimFuncAO]
+                loss_function: lossFuncDic[this.lossFuncAO]
             };
             data_to_send = JSON.stringify(data_to_send);
             var $this = this;

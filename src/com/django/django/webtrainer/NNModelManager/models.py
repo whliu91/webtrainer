@@ -6,12 +6,12 @@ class NNModelHistory(models.Model):
     '''
     Database for all models created by users
     '''
-    OPTIMIZE_FUNC_CHOICES = (
+    LOSS_FUNC_CHOICES = (
         ('mape', 'mape'),
         ('mse', 'mse'),
         ('mae', 'mae'),
     )
-    LOSS_FUNC_CHOICES = (
+    OPTIMIZE_FUNC_CHOICES = (
         ('sgd', 'sgd'),
         ('rmsprop', 'rmsprop'),
         ('adam', 'adam'),
@@ -50,3 +50,5 @@ class NNJobHistory(models.Model):
     job_end_time = models.DateTimeField(default=None, blank=True, null=True)
     job_status = models.CharField(max_length=50, choices=JOB_STATUS_CHOICES)
     user_created = models.CharField(max_length=50)
+    model_name = models.CharField(max_length=50)
+    weights_json = models.CharField(max_length=500, default=None, blank=True, null=True)
