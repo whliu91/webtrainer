@@ -32,6 +32,10 @@ For developers who is working on or want to contribute to the project. The web a
 
 **RabbitMQ**
 - message broker between django and celery
+- make sure start a virtual host (vhost) and enable management plugin with
+```sh
+$ rabbitmq-plugins enable rabbitmq_management
+```
 
 **MySQL 5.7.22**
 - Django 1 is not compatible with the current latest MySQL(8.0), if upgrade required will have to upgrade Django version first

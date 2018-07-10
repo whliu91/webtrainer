@@ -8,7 +8,7 @@
       <p style="font-size: 20px">
         1. model name: [[model_name]]<br>
         2. min error: [[min_err]]<br>
-        3. export weights json: [[weights]]</p>
+        3. export weights json: [[weights]]<br></p>
     </template>
     <template v-if="isReadyForTraining">
       <template v-if="isJobRunning">
@@ -61,7 +61,9 @@
       struct_png: null,
       model_name: null,
       min_err: null,
-      weights: null
+      weights: null,
+      timer: '',
+      isTimerRunning: false
     },
     delimiters: ["[[","]]"],
     methods: {
@@ -105,6 +107,36 @@
           $this.shouldShowStructure = false;
         });
       },
+      checkJobStatus(){
+        $this = this;
+        data_to_send = {
+            command: "check_job_status",
+        };
+        axios.post(
+            '/NNModelManager/Operations/',
+            data_to_send
+        )
+        .then(function(response){
+          console.log(response);
+          if(response.data == 1){
+            $this.isJobRunning = false;
+            clearInterval($this.timer);
+            this.isTimerRunning = false;
+          }
+          else{
+            $this.isJobRunning = true;
+            if (!$this.isTimerRunning){
+                // check status every 2 seconds
+                console.log("set timer");
+                $this.timer = setInterval($this.checkJobStatus, 2000);
+                $this.isTimerRunning = true;
+            }
+          }
+        })
+        .catch(function(error){
+          console.log(error);
+        });
+      },
       checkModel(){
         var $this = this;
         data_to_send = {
@@ -141,30 +173,16 @@
         .catch(function(error){
           console.log(error);
         });
-        data_to_send = {
-            command: "check_job_status",
-        };
-        axios.post(
-            '/NNModelManager/Operations/',
-            data_to_send
-        )
-        .then(function(response){
-          console.log(response);
-          if(response.data == 1){
-            $this.isJobRunning = false;
-          }
-          else{
-            $this.isJobRunning = true;
-          }
-        })
-        .catch(function(error){
-          console.log(error);
-        });
+        $this.checkJobStatus();
       },
     },
     beforeMount(){
       this.checkModel();
     },
+    beforeDestroy() {
+      clearInterval(this.timer);
+      this.isTimerRunning = false;
+    }
   });
 </script>
 {% endblock %}
