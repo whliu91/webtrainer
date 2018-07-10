@@ -62,20 +62,18 @@
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
         {% block content %}
-          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">Dashboard</h1>
-            <div class="btn-toolbar mb-2 mb-md-0">
-              <div class="btn-group mr-2">
-                <button class="btn btn-sm btn-outline-secondary">Share</button>
-                <button class="btn btn-sm btn-outline-secondary">Export</button>
+          <div id="vuejsblock">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+              <h1 class="h2">Dashboard</h1>
+              <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group mr-2">
+                  <button class="btn btn-sm btn-outline-secondary">Share</button>
+                  <button class="btn btn-sm btn-outline-secondary">Export</button>
+                </div>
               </div>
             </div>
-          </div>
-
-          <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
-
-          <h1>Model Configurations</h1>
-          <div id="vuejsblock">
+            <template><dashboard-chart :chartdata="chartdata"></dashboard-chart></template>
+            <h1>Model Configurations</h1>
             <div>
               <template v-if="shouldCreateNewModel">
                 <button @click="toggleModelCreateType" class="btn btn-secondary btn-lg btn-block">Use Existing Model</button><br>
@@ -152,8 +150,10 @@
     <script src="{% static "js/popper.min.js" %}"></script>
     <script src="{% static "js/bootstrap.min.js" %}"></script>
     <script src="{% static "js/vue.js" %}"></script>
-    <!-- TODO: download ivew and axios from npm and replace this -->
+    <!-- TODO: download iview and axios from npm and replace this -->
     <script src="//unpkg.com/iview/dist/iview.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+    <script src="https://unpkg.com/vue-chartjs/dist/vue-chartjs.min.js"></script>
     {% block js %}
     <!-- global event hub -->
     <script>
@@ -161,6 +161,25 @@
     new Vue({
       template: '<App/>',
     });
+    </script>
+    <!-- iview chart -->
+    <script>
+    var dashboardChart = {
+      extends: VueChartJs.Bar,
+      props:["chartdata"],
+      mounted() {
+        this.renderChart({
+          labels: this.chartdata.labels,
+          datasets: [
+            {
+              label: 'job history',
+              backgroundColor: '#f87979',
+              data: this.chartdata.data
+            }
+          ]
+        }, {responsive: true, maintainAspectRatio: false})
+      }
+    };
     </script>
     <!-- iView modal -->
     <script>
@@ -215,7 +234,9 @@
             v-model="confirm_modal1"
             title="Confirm Delete"
             @on-ok="ok"
-            @on-cancel="cancel">
+            @on-cancel="cancel"
+            ok-text="ok"
+            cancel-text="cancel">
             <p>Confirm Delete all reference of this model: [[target_model]]</p>
         </Modal>
       `
@@ -354,7 +375,11 @@
           lossFuncAO: "",
           errorMessage: "unknown error",
           loadComplete: false,
-          json: null
+          json: null,
+          chartdata: {
+            labels: ['a', 'b'],
+            data: [1, 2]
+          }
         },
         delimiters: ["[[","]]"],
         methods: {
@@ -472,11 +497,28 @@
                     .catch(function(error){
                       console.log(error);
                     });
+          },
+          beforeMount() {
+            var $this = this;
+            data_to_send = {
+                command: "check_run_history",
+            };
+            var $this = this;
+            axios.post('/NNModelManager/NNModelHome/',
+                    data_to_send)
+                    .then(function(response){
+                      console.log(response);
+                      $this.chartdata = response.data;
+                    })
+                    .catch(function(error){
+                      console.log(error);
+                    });
           }
         },
         components: {
           'history-model-list': HistoryModelList,
-          'confirm-delete-modal': confirmDeleteDialog
+          'confirm-delete-modal': confirmDeleteDialog,
+          'dashboard-chart': dashboardChart
         }
       });
     </script>
@@ -485,38 +527,6 @@
     <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
     <script>
       feather.replace()
-    </script>
-
-    <!-- Graphs -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
-    <script>
-      var ctx = document.getElementById("myChart");
-      var myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: ["1", "2", "3", "4", "5", "6", "7"],
-          datasets: [{
-            data: [15339, 21345, 18483, 24003, 23489, 24092, 12034],
-            lineTension: 0,
-            backgroundColor: 'transparent',
-            borderColor: '#007bff',
-            borderWidth: 4,
-            pointBackgroundColor: '#007bff'
-          }]
-        },
-        options: {
-          scales: {
-            yAxes: [{
-              ticks: {
-                beginAtZero: false
-              }
-            }]
-          },
-          legend: {
-            display: false,
-          }
-        }
-      });
     </script>
     {% endblock %}
   </body>

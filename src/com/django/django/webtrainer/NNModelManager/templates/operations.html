@@ -1,15 +1,19 @@
 {% extends 'index.html' %}
 {% block content %}
-<h1>Operations</h1>
+<h1 class="h2">Operations</h1>
 <div id="vuejsblock">
   <div class="container jumbotron" style="margin-top: 5px">
     <template v-if="isPreviousTrainingResultAvailable">
       <h2>Previous Job Result </h2><br>
       <p style="font-size: 20px">
         1. model name: [[model_name]]<br>
-        2. min error: [[min_err]]<br>
-        3. export weights json: [[weights]]<br></p>
+        2. min error: [[min_err]] %<br>
+        3. export weights json: 
+        <show-json-weights-dialog :weights="weights"></show-json-weights-dialog><br>
+      </p>
     </template>
+  </div>
+  <div class="container jumbotron" style="margin-top: 5px">
     <template v-if="isReadyForTraining">
       <template v-if="isJobRunning">
         <h2>There is a job running, please wait...</h2><br>
@@ -50,6 +54,56 @@
 </div>
 {% endblock %}
 {% block js %}
+<script>
+  var showJsonWeightsDialog = {
+    props: ["weights"],
+    delimiters: ["[[","]]"],
+    data () {
+        return {
+          showJsonModal: false
+        }
+    },
+    methods:{
+      ok(){
+        this.download(this.weights, 'weights.json', 'text/plain');
+      },
+      cancel(){
+        console.log('canceled');
+      },
+      download(data, filename, type) {
+        var file = new Blob([data], {type: type});
+        if (window.navigator.msSaveOrOpenBlob) // IE10+
+            window.navigator.msSaveOrOpenBlob(file, filename);
+        else { // Others
+            var a = document.createElement("a"),
+                    url = URL.createObjectURL(file);
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function() {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);  
+            }, 0); 
+        }
+    }
+    },
+    template: `
+    <div style="display: inline">
+      <Button type="primary" @click="showJsonModal = true">Export Weights</Button>
+      <Modal
+          v-model="showJsonModal"
+          title="Jsonified weights"
+          @on-ok="ok"
+          @on-cancel="cancel"
+          ok-text="Export As Json"
+          cancel-text="cancel">
+          <p>Jsonified Weights: [[weights]]</p>
+      </Modal>
+    </div>
+    `
+  };
+</script>
 <script>
   new Vue({
     el: '#vuejsblock',
@@ -156,7 +210,7 @@
             ){
               if (response.data.weights_json){
                 $this.weights = response.data.weights_json;
-                $this.min_err = response.data.min_train_err;
+                $this.min_err = Number(response.data.min_train_err).toFixed(2);
                 $this.model_name = response.data.records[0]["model_name"];
                 $this.isPreviousTrainingResultAvailable = true;
               }
@@ -182,6 +236,9 @@
     beforeDestroy() {
       clearInterval(this.timer);
       this.isTimerRunning = false;
+    },
+    components: {
+      'show-json-weights-dialog': showJsonWeightsDialog
     }
   });
 </script>

@@ -92,6 +92,11 @@ def index(request):
             user_profile_toChange.current_selected_model_name = model_name
             user_profile_toChange.save()
             return HttpResponseRedirect('/NNModelManager/dataManage/')
+        
+        elif (model_json['command'] == "check_run_history"):
+            logger.info("on load check run history request")
+            # TODO: implement this
+            return JsonResponse()
 
     return render(request, 'index.html')
 
