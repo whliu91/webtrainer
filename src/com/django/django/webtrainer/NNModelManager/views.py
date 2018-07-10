@@ -226,7 +226,7 @@ def operations(request):
                 return HttpResponse('1')
             logger.info("check status for job: " + job_id)
             job_obj = NNJobHistory.objects.get(job_id=job_id)
-            if job_obj.status == 'SUCCEED':
+            if job_obj.job_status == 'SUCCEED':
                 return HttpResponse('1')
             else:
                 return HttpResponse('0')

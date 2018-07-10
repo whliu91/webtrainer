@@ -2,6 +2,17 @@
 Web application for creating, training and testing Artificial Neuron Networks Online.
 
 ## Working environment Setup
+
+The easiest way to test the application is to run the server using django built-in server.
+For below commands to work it is expected that a message broker (e.g. RabbitMQ) is installed and running.
+
+```sh
+$ python manage.py celery worker --loglevel=info
+$ python manage.py runserver
+```
+
+Please note before this you would have to install necessary packages:
+
 For developers who is working on or want to contribute to the project. The web application is mainly powered by Django on Python 3.6.5, the current tools in use is listed here
 
 ### Prerequisite-Tools

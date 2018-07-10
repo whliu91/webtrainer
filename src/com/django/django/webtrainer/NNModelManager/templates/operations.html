@@ -125,6 +125,7 @@
               if (response.data.weights_json){
                 $this.weights = response.data.weights_json;
                 $this.min_err = response.data.min_train_err;
+                $this.model_name = response.data.records.model_name;
                 $this.isPreviousTrainingResultAvailable = true;
               }
               console.log("ready for training confirmed");

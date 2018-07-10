@@ -179,5 +179,5 @@ def submitTrainingJob(model_name, user_obj):
     )
     user_obj.current_running_job_id = job_id
     user_obj.save()
-    async_task.trainNetworkByName(NNModelHistory.objects.get(model_name=model_name), job_id)
+    async_task.trainNetworkByName.delay(NNModelHistory.objects.get(model_name=model_name), job_id)
     return True
