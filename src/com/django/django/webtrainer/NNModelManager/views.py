@@ -95,8 +95,7 @@ def index(request):
         
         elif (model_json['command'] == "check_run_history"):
             logger.info("on load check run history request")
-            # TODO: implement this
-            return JsonResponse()
+            return JsonResponse(trainer_util.getJobHistoryMetadata())
 
     return render(request, 'index.html')
 

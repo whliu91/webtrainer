@@ -2,7 +2,7 @@ import csv
 import numpy as np
 from NNModelManager.models import NNModelHistory, NNJobHistory
 from NNModelManager.util import plotNN, async_task
-from datetime import datetime
+from datetime import datetime, timedelta
 from util import DataConversion
 import os
 import logging
@@ -181,3 +181,15 @@ def submitTrainingJob(model_name, user_obj):
     user_obj.save()
     async_task.trainNetworkByName.delay(NNModelHistory.objects.get(model_name=model_name), job_id)
     return True
+
+def getJobHistoryMetadata():
+    '''
+    Query NNJobHistory database and get previous 7 days' records.
+    '''
+    record_start_date = datetime.now() - timedelta(days=7)
+    QS = NNJobHistory.objects.filter(job_start_time__gt=record_start_date)
+    print(list(QS))
+    return {
+        "labels": ['a', 'b'],
+        "data": [1, 2]
+    }

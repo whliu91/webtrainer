@@ -377,8 +377,8 @@
           loadComplete: false,
           json: null,
           chartdata: {
-            labels: ['a', 'b'],
-            data: [1, 2]
+            labels: null,
+            data: null
           }
         },
         delimiters: ["[[","]]"],
@@ -498,22 +498,23 @@
                       console.log(error);
                     });
           },
-          beforeMount() {
-            var $this = this;
-            data_to_send = {
-                command: "check_run_history",
-            };
-            var $this = this;
-            axios.post('/NNModelManager/NNModelHome/',
-                    data_to_send)
-                    .then(function(response){
-                      console.log(response);
-                      $this.chartdata = response.data;
-                    })
-                    .catch(function(error){
-                      console.log(error);
-                    });
-          }
+        },
+        beforeMount() {
+          var $this = this;
+          data_to_send = {
+              command: "check_run_history",
+          };
+          console.log("check_run_history");
+          axios.post('/NNModelManager/NNModelHome/',
+                  data_to_send)
+                  .then(function(response){
+                    $this.chartdata.labels = response.data.labels;
+                    $this.chartdata.data = response.data.data;
+                    console.log($this.chartdata);
+                  })
+                  .catch(function(error){
+                    console.log(error);
+                  });
         },
         components: {
           'history-model-list': HistoryModelList,
