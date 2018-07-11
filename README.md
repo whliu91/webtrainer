@@ -8,6 +8,7 @@ For developers who is working on or want to contribute to the project. The web a
 - Setup required software for this project
 
 |tools|website|descriptions|
+|-|-|-|
 |git|https://git-scm.com/|version control|
 |python|https://www.python.org/downloads/release/python-365/|python 3.6.5|
 |MySQL|https://dev.mysql.com/downloads/mysql/5.7.html#downloads|database for project (changable)|
@@ -31,6 +32,7 @@ In the terminal/cmd.exe, type:
 (replace `myuser` and `mypassword` to something you can remenmber, this will be required in `SETTINGS.py` as well)
 
 |Unix|Windows|
+|-|-|
 |sudo rabbitmqctl add_user myuser mypassword|rabbitmqctl.bat add_user myuser mypassword|
 |sudo rabbitmqctl set_user_tags myuser administrator|rabbitmqctl.bat set_user_tags myuser administrator|
 |sudo rabbitmqctl add_vhost vhost|rabbitmqctl.bat add_vhost vhost|
