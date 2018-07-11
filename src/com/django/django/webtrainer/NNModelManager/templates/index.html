@@ -67,12 +67,11 @@
               <h1 class="h2">Dashboard</h1>
               <div class="btn-toolbar mb-2 mb-md-0">
                 <div class="btn-group mr-2">
-                  <button class="btn btn-sm btn-outline-secondary">Share</button>
-                  <button class="btn btn-sm btn-outline-secondary">Export</button>
+                  <button @click="saveImage" class="btn btn-sm btn-outline-secondary">Export</button>
                 </div>
               </div>
             </div>
-            <template><dashboard-chart :chartdata="chartdata"></dashboard-chart></template>
+            <template><dashboard-chart></dashboard-chart></template>
             <h1>Model Configurations</h1>
             <div>
               <template v-if="shouldCreateNewModel">
@@ -166,18 +165,34 @@
     <script>
     var dashboardChart = {
       extends: VueChartJs.Bar,
-      props:["chartdata"],
+      methods: {
+        fetchData(){
+          var $this = this;
+          data_to_send = {
+              command: "check_run_history",
+          };
+          console.log("check_run_history");
+          axios.post('/NNModelManager/NNModelHome/',
+                  data_to_send)
+                  .then(function(response){
+                    $this.renderChart({
+                      labels: response.data.labels,
+                      datasets: [
+                        {
+                          label: 'job history',
+                          backgroundColor: '#f87979',
+                          data: response.data.data
+                        }
+                      ]
+                    }, {responsive: true, maintainAspectRatio: false})
+                  })
+                  .catch(function(error){
+                    console.log(error);
+                  });
+        }
+      },
       mounted() {
-        this.renderChart({
-          labels: this.chartdata.labels,
-          datasets: [
-            {
-              label: 'job history',
-              backgroundColor: '#f87979',
-              data: this.chartdata.data
-            }
-          ]
-        }, {responsive: true, maintainAspectRatio: false})
+        this.fetchData();
       }
     };
     </script>
@@ -376,13 +391,16 @@
           errorMessage: "unknown error",
           loadComplete: false,
           json: null,
-          chartdata: {
-            labels: null,
-            data: null
-          }
         },
         delimiters: ["[[","]]"],
         methods: {
+          saveImage(){
+            let canvas = document.getElementById('bar-chart').toDataURL('image/png');
+            let link = document.createElement('a');
+            link.download = 'image';
+            link.href = canvas;
+            link.click();
+          },
           toggleModelCreateType: function () {
             var $this = this;
             this.shouldShowMoreConfig = false;
@@ -394,7 +412,6 @@
                 command: "get_history_model",
               };
               data_to_send = JSON.stringify(data_to_send);
-              console.log(data_to_send);
               axios.post('/NNModelManager/NNModelHome/',
                       data_to_send)
                       .then(function(response){
@@ -498,23 +515,6 @@
                       console.log(error);
                     });
           },
-        },
-        beforeMount() {
-          var $this = this;
-          data_to_send = {
-              command: "check_run_history",
-          };
-          console.log("check_run_history");
-          axios.post('/NNModelManager/NNModelHome/',
-                  data_to_send)
-                  .then(function(response){
-                    $this.chartdata.labels = response.data.labels;
-                    $this.chartdata.data = response.data.data;
-                    console.log($this.chartdata);
-                  })
-                  .catch(function(error){
-                    console.log(error);
-                  });
         },
         components: {
           'history-model-list': HistoryModelList,

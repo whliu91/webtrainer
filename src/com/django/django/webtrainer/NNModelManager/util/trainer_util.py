@@ -2,7 +2,7 @@ import csv
 import numpy as np
 from NNModelManager.models import NNModelHistory, NNJobHistory
 from NNModelManager.util import plotNN, async_task
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from util import DataConversion
 import os
 import logging
@@ -186,10 +186,17 @@ def getJobHistoryMetadata():
     '''
     Query NNJobHistory database and get previous 7 days' records.
     '''
-    record_start_date = datetime.now() - timedelta(days=7)
+    record_start_date = datetime.now() - timedelta(days=6)
+    date_list_ref = [(record_start_date + timedelta(days=x)).date() for x in range(0, 7)]
     QS = NNJobHistory.objects.filter(job_start_time__gt=record_start_date)
-    print(list(QS))
-    return {
-        "labels": ['a', 'b'],
-        "data": [1, 2]
+    date_list_db = [item.job_start_time.date() for item in list(QS)]
+    data = [0] * 7
+    for job_date in date_list_db:
+        data[date_list_ref.index(job_date)] += 1
+
+    labels = [item.strftime("%Y-%m-%d") for item in date_list_ref]
+    ret = {
+        "labels": labels,
+        "data": data
     }
+    return ret
