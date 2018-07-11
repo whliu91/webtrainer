@@ -3,25 +3,75 @@ Web application for creating, training and testing Artificial Neuron Networks On
 
 ## Working environment Setup
 
+For developers who is working on or want to contribute to the project. The web application is powered by (tested on) Django 1.11.8 on Python 3.6.5 with Google Chrome Browser, to setup working environment, follow below steps:
+
+- Setup required software for this project
+|tools|website|descriptions|
+|git|https://git-scm.com/|version control|
+|python|https://www.python.org/downloads/release/python-365/|python 3.6.5|
+|MySQL|https://dev.mysql.com/downloads/mysql/5.7.html#downloads|database for project (changable)|
+|RabbitMQ|https://www.rabbitmq.com/download.html|async message broker (changable)|
+*When installing MySQL, select full-install, and you will be prompted to create a root user's account, do remember the credentials which will be required in the django `SETTINGS.py`
+
+- setup environment
+If you are not familiar with python virtualenv, read this(https://virtualenv.pypa.io/en/stable/) first.
+
+Clone this repository using git, and run
+```sh
+$ bash script/setup_env.sh
+```
+*Python's Virtualenv directory is slightly different under Windows and Unix-like OS. This script automatically handles this directory differences, however if you are coding in Windows, you would probably need something that provides a shell like interface to run this script - this is not tested, otherwise, setup a virtualenv and install requried packages `(script/requirements.txt)` via pip manually.
+
+- config RabbitMQ
+The difference in windows and unix-systmes are minor for RabbitMQ, ultimately just use the `.bat` files in the installed packages in windows that has the same name with those in shell. 
+
+In the terminal/cmd.exe, type: 
+(replace `myuser` and `mypassword` to something you can remenmber, this will be required in `SETTINGS.py` as well)
+|Unix|Windows|
+|sudo rabbitmqctl add_user myuser mypassword|rabbitmqctl.bat add_user myuser mypassword|
+|sudo rabbitmqctl set_user_tags myuser administrator|rabbitmqctl.bat set_user_tags myuser administrator|
+|sudo rabbitmqctl add_vhost vhost|rabbitmqctl.bat add_vhost vhost|
+|sudo rabbitmqctl set_permissions -p vhost myuser ".*" ".*" ".*"|rabbitmqctl.bat set_permissions -p vhost myuser ".*" ".*" ".*"|
+|rabbitmq-plugins enable rabbitmq_management|rabbitmq-plugins.bat enable rabbitmq_management|
+
+Go to {hostip(normally 127.0.0.1)}:15672 to see if this worked
+
+- go to venv and setup project
+activate the venv by:
+```sh
+$ source venv/bin/activate
+```
+or on windows:
+```sh
+venv/Scripts/activate.bat
+```
+cd to src/com/django/django/webtrainer/
+under `\webtrainer` folder, there is a `settings.py`
+change the `DATABASES` property to your MySQL root user config and
+the `BROKER_URL` to your RabbitMQ credentials.
+
+Then, initialise database with:
+```sh
+$ python manage.py makemigrations
+$ python manage.py migrate
+```
+
+- start server and test!
 The easiest way to test the application is to run the server using django built-in server.
-For below commands to work it is expected that a message broker (e.g. RabbitMQ) is installed and running.
 
 ```sh
 $ python manage.py celery worker --loglevel=info
 $ python manage.py runserver
 ```
-
-Please note before this you would have to install necessary packages:
-
-For developers who is working on or want to contribute to the project. The web application is mainly powered by Django on Python 3.6.5, the current tools in use is listed here
+default server runs on http://127.0.0.1:8000/
 
 ### Prerequisite-Tools
-
+List of all the packages used in this project (updating)
 #### Front End
 *BootStrap - multiple version see html templates in templates folders.* <br />
-*Vue.js 2.0*
-*iView 2.0*
-*axios*
+*Vue.js 2.0* <br />
+*iView 2.0* <br />
+*axios 0.18.0* <br />
 
 #### Back End
 **Django 1.11.8**
