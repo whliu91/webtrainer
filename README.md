@@ -14,6 +14,7 @@ For developers who is working on or want to contribute to the project. The web a
 |MySQL|https://dev.mysql.com/downloads/mysql/5.7.html#downloads|database for project (changable)|
 |RabbitMQ|https://www.rabbitmq.com/download.html|async message broker (changable)|
 |NPM|https://www.npmjs.com/|js package manager (optional)|
+
 *When installing MySQL, select full-install, and you will be prompted to create a root user's account, do remember the credentials which will be required in the django `SETTINGS.py`
 
 - setup environment  <br />
