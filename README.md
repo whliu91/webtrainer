@@ -6,6 +6,7 @@ Web application for creating, training and testing Artificial Neuron Networks On
 For developers who is working on or want to contribute to the project. The web application is powered by (tested on) Django 1.11.8 on Python 3.6.5 with Google Chrome Browser, to setup working environment, follow below steps:
 
 - Setup required software for this project <br />
+
 |tools|website|descriptions|
 |-|-|-|
 |git|https://git-scm.com/|version control|
