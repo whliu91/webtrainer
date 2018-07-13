@@ -5,15 +5,16 @@ Web application for creating, training and testing Artificial Neuron Networks On
 
 For developers who is working on or want to contribute to the project. The web application is powered by (tested on) Django 1.11.8 on Python 3.6.5 with Google Chrome Browser, to setup working environment, follow below steps:
 
-- Setup required software for this project
+- Setup required software for this project <br />
 |tools|website|descriptions|
 |git|https://git-scm.com/|version control|
 |python|https://www.python.org/downloads/release/python-365/|python 3.6.5|
 |MySQL|https://dev.mysql.com/downloads/mysql/5.7.html#downloads|database for project (changable)|
 |RabbitMQ|https://www.rabbitmq.com/download.html|async message broker (changable)|
+|NPM|https://www.npmjs.com/|js package manager (optional)|
 *When installing MySQL, select full-install, and you will be prompted to create a root user's account, do remember the credentials which will be required in the django `SETTINGS.py`
 
-- setup environment
+- setup environment  <br />
 If you are not familiar with python virtualenv, read this(https://virtualenv.pypa.io/en/stable/) first.
 
 Clone this repository using git, and run
@@ -22,7 +23,7 @@ $ bash script/setup_env.sh
 ```
 *Python's Virtualenv directory is slightly different under Windows and Unix-like OS. This script automatically handles this directory differences, however if you are coding in Windows, you would probably need something that provides a shell like interface to run this script - this is not tested, otherwise, setup a virtualenv and install requried packages `(script/requirements.txt)` via pip manually.
 
-- config RabbitMQ
+- config RabbitMQ  <br />
 The difference in windows and unix-systmes are minor for RabbitMQ, ultimately just use the `.bat` files in the installed packages in windows that has the same name with those in shell. 
 
 In the terminal/cmd.exe, type: 
@@ -36,7 +37,7 @@ In the terminal/cmd.exe, type:
 
 Go to {hostip(normally 127.0.0.1)}:15672 to see if this worked
 
-- go to venv and setup project
+- go to venv and setup project  <br />
 activate the venv by:
 ```sh
 $ source venv/bin/activate
@@ -56,7 +57,7 @@ $ python manage.py makemigrations
 $ python manage.py migrate
 ```
 
-- start server and test!
+- start server and test!  <br />
 The easiest way to test the application is to run the server using django built-in server.
 
 ```sh
@@ -68,10 +69,20 @@ default server runs on http://127.0.0.1:8000/
 ### Prerequisite-Tools
 List of all the packages used in this project (updating)
 #### Front End
-*BootStrap - multiple version see html templates in templates folders.* <br />
+Npm is used in this project only for getting specific versions of js modules, init npm in the project root folder, install all required packages and run:
+```sh
+$ python manage.py collectstatic
+```
+to copy them into django's static file folder
+* Note: 
+1. the basic packages are already in the static folder and tracked on git, do above only when you are trying to add more javascript packages.
+2. static folder /static/ is where python collectstatic will end up with, for customized static files, please put in /projstatic/ folder.
+
+*BootStrap 4.2.0* <br />
 *Vue.js 2.0* <br />
 *iView 2.0* <br />
 *axios 0.18.0* <br />
+*chart.js 2.7.1* <br />
 
 #### Back End
 **Django 1.11.8**

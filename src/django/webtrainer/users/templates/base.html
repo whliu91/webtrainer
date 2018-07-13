@@ -1,0 +1,39 @@
+{% load i18n staticfiles %}<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>{% block title %}{{ title|default:"USER MANAGEMENT"}}{% endblock %}</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	{% load static %}
+    <title>Neural Network Trainer</title>
+    <!-- Bootstrap core CSS -->
+    <link href="{% static "npm/bootstrap/dist/css/bootstrap.min.css" %}" rel="stylesheet">
+	<script src="{% static "npm/jquery/dist/jquery.slim.min.js" %}"></script>
+    <!-- Custom styles for this template -->
+    <link href="{% static "css/dashboard.css" %}" rel="stylesheet">
+	<script src="{% static "npm/vue/dist/vue.js" %}"></script>
+	<script src="{% static "npm/iview/dist/iview.js" %}"></script>
+</head>
+<body>
+	
+<nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow" style="position: fixed;">      
+	<a class="navbar-brand" href="#">Neural Network Trainer</a>
+</nav>
+<div class="container jumbotron">
+	<div class="mx-auto">
+		{% if messages %}
+			{% for message in messages %}
+				<div class="alert {% if message.tags %}alert-{{ message.tags }}"{% endif %}>{{ message }}</div>
+			{% endfor %}
+		{% endif %}
+		{% block content %}
+			<p>Use this template get you up and running with django-users2.</p>
+		{% endblock content %}
+	</div>
+</div>
+</body>
+</html>
+{% block js %}
+{% endblock %}

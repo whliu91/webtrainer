@@ -14,3 +14,5 @@ uploads/
 logs/
 #figs
 figures/
+#node
+node_modules/

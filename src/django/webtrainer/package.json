@@ -1,0 +1,32 @@
+{
+  "name": "webtrainer",
+  "version": "0.0.1",
+  "description": "the webtrainer project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/whliu91/webtrainer.git"
+  },
+  "keywords": [
+    "Neuron",
+    "Network"
+  ],
+  "author": "Weihang Liu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/whliu91/webtrainer/issues"
+  },
+  "homepage": "https://github.com/whliu91/webtrainer#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "bootstrap": "^4.1.0",
+    "chart.js": "^2.7.1",
+    "iview": "^2.14.3",
+    "jquery": "^3.3.1",
+    "vue": "^2.5.16",
+    "vue-chartjs": "^3.3.2"
+  }
+}

@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Neural Network Trainer</title>
+    {% load static %}
+    <!-- Bootstrap core CSS -->
+    <link href="{% static "npm/bootstrap/dist/css/bootstrap.min.css" %}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{% static "css/dashboard.css" %}" rel="stylesheet">
+
+    <!-- iView CSS -->
+    <link href="{% static "npm/iview/dist/styles/iview.css" %}" rel="stylesheet">
+
+    <script src="{% static "npm/jquery/dist/jquery.slim.min.js" %}"></script>
+    <script src="{% static "npm/axios/dist/axios.min.js" %}"></script>
+    <script src="{% static "npm/popper.js/dist/umd/popper.min.js" %}"></script>
+    <script src="{% static "npm/bootstrap/dist/js/bootstrap.min.js" %}"></script>
+    <script src="{% static "npm/vue/dist/vue.js" %}"></script>
+    <script src="{% static "npm/iview/dist/iview.js" %}"></script>
+    <script src="{% static "npm/chart.js/dist/Chart.min.js" %}"></script>
+    {% block header %}
+    {% endblock %}
+  </head>
+
+  <body>
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="/">Neural Network Trainer</a>
+      <ul class="navbar-nav bd-navbar-nav flex-row px-3">
+        <li class="nav-item" style="margin-right: 10px">
+          <a class="nav-link" href="/accounts/logout/">Sign out</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/accounts/profile/">Edit Profile</a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link active" href="/NNModelManager/NNModelHome/">
+                  <span data-feather="home"></span>
+                  Dashboard <span class="sr-only">(current)</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/NNModelManager/dataManage/">
+                  <span data-feather="file"></span>
+                  Data Managerment
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/NNModelManager/Operations/">
+                  <span data-feather="file"></span>
+                  Operations
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+        {% block content %}
+          <div id="vuejsblock">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+              <h1 class="h2">Dashboard</h1>
+              <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group mr-2">
+                  <button @click="saveImage" class="btn btn-sm btn-outline-secondary">Export</button>
+                </div>
+              </div>
+            </div>
+            <canvas id="bar-chart" width="200" height="150"></canvas>
+            <h1>Model Configurations</h1>
+            <div>
+              <template v-if="shouldCreateNewModel">
+                <button @click="toggleModelCreateType" class="btn btn-secondary btn-lg btn-block">Use Existing Model</button><br>
+                <h3 align="center">Create New Model</h1>
+                <template v-if="shouldShowErrorMessage">
+                  <p class="text-warning">Error: [[errorMessage]]</p>
+                </template>
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" style="width: 200px">Model Name</span>
+                  </div>
+                  <input type="text" class="form-control" v-model="modelNameAO" placeholder="model name" aria-label="Model name" aria-describedby="modelNameAO">
+                </div>
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" style="width: 200px">Number of Input</span>
+                  </div>
+                  <input type="text" class="form-control" v-model="numInputAO" placeholder="5" aria-label="Number of Input" aria-describedby="numInputAO">
+                </div>
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" style="width: 200px">Number of Layers</span>
+                  </div>
+                  <input type="text" class="form-control" v-model="numLayersAO" placeholder="5" aria-label="Number of Layers" aria-describedby="numLayersAO">
+                </div>
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" style="width: 200px">Number of Neurons</span>
+                  </div>
+                  <input type="text" class="form-control" v-model="numNeuronsPerLayersAO" placeholder="Input for all layers, seperate by comma ',' e.g. 3,5,2" aria-label="Number of Neurons" aria-describedby="numNeuronsPerLayersAO">
+                </div>
+                <button @click="applyModelBasicConfig" class="btn btn-secondary btn-lg btn-block">Apply</button><br>
+                <div id="vuejsblock">
+                <template v-if="shouldShowMoreConfig">
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <label class="input-group-text" for="lossFuncAO" style="width: 200px">loss functions</label>
+                    </div>
+                    <select class="custom-select" v-model="lossFuncAO">
+                      <option selected>Choose...</option>
+                      <option value="1">mape</option>
+                      <option value="2">mse</option>
+                      <option value="3">mae</option>
+                    </select>
+                  </div>
+                  <button @click="saveNewModel" class="btn btn-secondary btn-lg btn-block">Create</button><br>
+                </template>
+                </div>
+              </template>
+              <template v-else-if="loadComplete">
+                <button @click="toggleModelCreateType" class="btn btn-secondary btn-lg btn-block">Create New Model</button><br>
+                <div><history-model-list :json="json"></history-model-list></div>
+                <confirm-delete-modal></confirm-delete-modal>
+              </template>
+              <template v-else>
+                <spin>
+                    <icon type="load-c" size=18 class="demo-spin-icon-load"></icon>
+                    <div>Loading</div>
+                </spin>
+              </template>
+            </div>
+          </div>
+          </div>
+        {% endblock %}
+        </main>
+      </div>
+    </div>
+
+
+    {% block js %}
+    <!-- global event hub -->
+    <script>
+    Vue.prototype.$eventHub = new Vue(); // Global event bus
+    new Vue({
+      template: '<App/>',
+    });
+    </script>
+    <!-- iView modal -->
+    <script>
+    var confirmDeleteDialog = {
+      data: function(){
+        return{
+          confirm_modal1: false,
+          target_model: null,
+          target_row: null
+        }
+      },
+      delimiters: ["[[","]]"],
+      methods:{
+        showModal(data){
+          this.confirm_modal1 = true;
+          this.target_model = data.name;
+          this.target_row = data.index;
+        },
+        ok(){
+          // save this for emit event
+          var $this = this;
+          console.log('confirmed delete model, posting to backend');
+          data_to_send = {
+                command: "delete_model",
+                model_name: this.target_model
+              };
+          data_to_send = JSON.stringify(data_to_send);
+          console.log(data_to_send);
+          axios.post('/NNModelManager/NNModelHome/',
+                  data_to_send)
+                  .then(function(response){
+                    console.log(response.data);
+                    var data = this.target_row;
+                    $this.$eventHub.$emit('model_deleted', data);
+                  })
+                  .catch(function(error){
+                    console.log(error);
+                  });
+        },
+        cancel(){
+          console.log('delete canceled')
+        }
+      },
+      created() {
+        this.$eventHub.$on('showModalEvent', this.showModal);
+      },
+      beforeDestroy() {
+        this.$eventHub.$off('showModalEvent');
+      },
+      template: `
+        <Modal
+            v-model="confirm_modal1"
+            title="Confirm Delete"
+            @on-ok="ok"
+            @on-cancel="cancel"
+            ok-text="ok"
+            cancel-text="cancel">
+            <p>Confirm Delete all reference of this model: [[target_model]]</p>
+        </Modal>
+      `
+    };
+    </script>
+    <!-- iView Table -->
+    <script>
+    var HistoryModelList = {
+      props: ["json"],
+      data: function() {
+        return {
+          columnsList: [
+            {
+                title: "Model Name",
+                key: "model_name",
+                width: 110,
+            },
+            {
+                title: "Number of Layers",
+                key: "num_layers",
+                width: 160,
+                sortable: true
+            },
+            {
+                title: "Min Train Error",
+                key: "min_train_err",
+                width: 150,
+                sortable: true
+            },
+            {
+                title: "Create Date",
+                key: "src_date",
+                width: 130,
+                sortable: true
+            },
+            {
+                title: "Create User",
+                key: "user_created",
+                width: 150
+            },
+            {
+                title: 'Action',
+                key: 'action',
+                width: 150,
+                align: 'center',
+                render: (h, params) => {
+                    return h('div', [
+                        h('Button', {
+                            props: {
+                                type: 'primary',
+                                size: 'small'
+                            },
+                            style: {
+                                marginRight: '5px'
+                            },
+                            on: {
+                                click: () => {
+                                  console.log("request to select model: " + params.row.model_name);
+                                  this.select(params.row.model_name);
+                                }
+                            }
+                        }, 'Select'),
+                        h('Button', {
+                            props: {
+                                type: 'error',
+                                size: 'small'
+                            },
+                            on: {
+                                click: () => {
+                                  var data = {
+                                    name: params.row.model_name,
+                                    index: params.index
+                                  };
+                                  console.log("request to remove model: " + data.name);
+                                  this.$eventHub.$emit('showModalEvent', data);
+                                }
+                            }
+                        }, 'Delete')
+                    ]);
+                }
+            }
+          ]
+        };
+      },
+      methods: {
+        deleteRow(data){
+          console.log("eventHub: require delete row event: " + data)
+          this.remove(data);
+        },
+        remove(index){
+          this.json.records.splice(index, 1);
+        },
+        select(model){
+          data_to_send = {
+                command: "user_select_model",
+                model_name: model
+              };
+          data_to_send = JSON.stringify(data_to_send);
+          axios.post('/NNModelManager/NNModelHome/',
+                    data_to_send)
+                    .then(function(response){
+                      console.log(response)
+                      var url = response.request.responseURL;
+                      window.location.href = url;
+                    })
+                    .catch(function(error){
+                      console.log(error);
+                    });
+        }
+      },
+      created() {
+        this.$eventHub.$on('model_deleted', this.deleteRow);
+      },
+      beforeDestroy() {
+        this.$eventHub.$off('model_deleted');
+      },
+      template: `
+          <div style="width:100%; height:100%; padding:20px;">
+              <Table style="height:100%;" border :columns="columnsList" :data="json.records" v-if="json.result=='success'"></Table>
+          </div>
+      `
+    };
+    </script>
+    <!-- vuejs -->
+    <script>
+      new Vue({
+        el: '#vuejsblock',
+        data: {
+          shouldCreateNewModel: true,
+          shouldShowMoreConfig: false,
+          shouldShowErrorMessage: false,
+          modelNameAO: "",
+          numInputAO: "",
+          numLayersAO: "",
+          numNeuronsPerLayersAO: "",
+          lossFuncAO: "",
+          errorMessage: "unknown error",
+          loadComplete: false,
+          json: null,
+        },
+        delimiters: ["[[","]]"],
+        methods: {
+          saveImage(){
+            let canvas = document.getElementById('bar-chart').toDataURL('image/png');
+            let link = document.createElement('a');
+            link.download = 'image';
+            link.href = canvas;
+            link.click();
+          },
+          toggleModelCreateType: function () {
+            var $this = this;
+            this.shouldShowMoreConfig = false;
+            this.shouldCreateNewModel = !this.shouldCreateNewModel;
+            if (!this.shouldCreateNewModel)
+            {
+              // query db to get all models
+              data_to_send = {
+                command: "get_history_model",
+              };
+              data_to_send = JSON.stringify(data_to_send);
+              axios.post('/NNModelManager/NNModelHome/',
+                      data_to_send)
+                      .then(function(response){
+                        $this.loadComplete = true;
+                        $this.json = response.data;
+                        console.log($this.json.records);
+                      })
+                      .catch(function(error){
+                        console.log(error);
+                      });
+            }
+            return
+          },
+          checkNeuronString: function(str){
+            var array = str.split(',');
+            if (array.length != parseInt(this.numLayersAO))
+            {
+              // neuron array does not match number of layers
+              return false
+            }
+            else
+            {
+              var i;
+              for (i = 0; i < parseInt(this.numLayersAO); i++)
+              {
+                var value = parseInt(array[i]);
+                if (value < 0 | value > 100 | isNaN(value))
+                {
+                  // neuron range error
+                  return false
+                }
+              }
+            }
+            return true
+          },
+          applyModelBasicConfig: function () {
+            if (this.modelNameAO.length == 0)
+            {
+              this.errorMessage = "Model name invalid";
+              this.shouldShowErrorMessage = true;
+              return this.shouldShowMoreConfig = false
+            }
+            if ((this.numInputAO < 1) | (this.numInputAO > 50))
+            {
+              this.errorMessage = "Invalid number of input (1 ~ 50)";
+              this.shouldShowErrorMessage = true;
+              return this.shouldShowMoreConfig = false
+            }
+            if ((this.numLayersAO < 2) | (this.numLayersAO > 10))
+            {
+              this.errorMessage = "Invalid number of layers (2 ~ 10)";
+              this.shouldShowErrorMessage = true;
+              return this.shouldShowMoreConfig = false
+            }
+            if (!this.checkNeuronString(this.numNeuronsPerLayersAO))
+            {
+              this.errorMessage = "Invalid neurons string format";
+              this.shouldShowErrorMessage = true;
+              return this.shouldShowMoreConfig = false
+            }
+            this.shouldShowErrorMessage = false;
+            return this.shouldShowMoreConfig = true
+          },
+          saveNewModel: function(){
+            var lossFuncDic = {
+              "1": "mape",
+              "2": "mse",
+              "3": "mae"
+            }
+            if (!lossFuncDic.hasOwnProperty(this.lossFuncAO))
+            {
+              this.errorMessage = "invalid selection on loss function";
+              return this.shouldShowErrorMessage = true;
+            }
+            this.shouldShowErrorMessage = false;
+            data_to_send = {
+                command: "save_json_model",
+                model_name: this.modelNameAO,
+                num_input: this.numInputAO,
+                num_layers: this.numLayersAO,
+                num_neuron_layer_str: this.numNeuronsPerLayersAO,
+                loss_function: lossFuncDic[this.lossFuncAO]
+            };
+            data_to_send = JSON.stringify(data_to_send);
+            var $this = this;
+            axios.post('/NNModelManager/NNModelHome/',
+                    data_to_send)
+                    .then(function(response){
+                      console.log(response);
+                      if (response.data == 1)
+                      {
+                        alert("the model name you have entered already exist, please use another one");
+                      }
+                      else
+                      {
+                        $this.shouldCreateNewModel = false;
+                        location.reload();
+                      }
+                    })
+                    .catch(function(error){
+                      console.log(error);
+                    });
+          },
+          loadChart(){
+            var $this = this;
+            data_to_send = {
+                command: "check_run_history",
+            };
+            console.log("check_run_history");
+            axios.post('/NNModelManager/NNModelHome/',
+                    data_to_send)
+                    .then(function(response){
+                      console.log(response.data.data);
+                      var barCanvas = document.getElementById("bar-chart");
+                      var barChart = new Chart(barCanvas, {
+                        type: 'bar',
+                        data: {
+                          labels: response.data.labels,
+                          datasets: [{
+                            label: 'jobs run in week',
+                            data: response.data.data,
+                            backgroundColor: [
+                              'rgba(255, 99, 132, 0.6)',
+                              'rgba(54, 162, 235, 0.6)',
+                              'rgba(255, 206, 86, 0.6)',
+                              'rgba(75, 192, 192, 0.6)',
+                              'rgba(153, 102, 255, 0.6)',
+                              'rgba(255, 159, 64, 0.6)',
+                              'rgba(255, 99, 132, 0.6)',
+                            ]
+                          }]
+                        }
+                      })
+                    })
+                    .catch(function(error){
+                      console.log(error);
+                    });
+          }
+        },
+        mounted(){
+          this.loadChart();
+        },
+        components: {
+          'history-model-list': HistoryModelList,
+          'confirm-delete-modal': confirmDeleteDialog,
+        }
+      });
+    </script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+    <script>
+      feather.replace()
+    </script>
+    {% endblock %}
+  </body>
+</html>
