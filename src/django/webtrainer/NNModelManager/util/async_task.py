@@ -30,7 +30,12 @@ def trainNetworkByName(model_obj, job_id):
     data_file_path = os.path.join(settings.NN_MODEL_DATA_PATH, model_obj.data_file_path)
     data = pandas.read_csv(data_file_path, delimiter=',', header=None)
     data_set = data.values
-    index_of_target = headers.index(target)
+    print(headers)
+    headers_list = headers.split(',')
+    print(headers_list)
+    print(target)
+
+    index_of_target = headers_list.index(target)
     Y = data_set[:, index_of_target]
     X = np.delete(data_set, index_of_target, 1)
 

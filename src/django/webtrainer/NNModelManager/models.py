@@ -28,7 +28,7 @@ class NNModelHistory(models.Model):
     epoch_size = models.IntegerField()
     num_layers = models.IntegerField()
     num_neurons_layer_str = models.CharField(max_length=100)
-    weights_json = models.CharField(max_length=500, default=None, blank=True, null=True)
+    weights_json = models.CharField(max_length=5000, default=None, blank=True, null=True)
     min_train_err = models.FloatField(default=None, blank=True, null=True)
     data_file_path = models.FilePathField(path=settings.NN_MODEL_DATA_PATH, default=None, blank=True, null=True)
     data_rows = models.IntegerField(default=0)

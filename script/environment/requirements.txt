@@ -8,6 +8,7 @@ django-appconf==1.0.2
 django-celery==3.2.2
 django-model-utils==3.1.2
 django-users2==0.2.2
+django-npm==1.0.0
 h5py==2.8.0
 Keras==2.2.0
 Keras-Applications==1.0.2

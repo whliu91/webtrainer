@@ -230,9 +230,9 @@ def operations(request):
                 return HttpResponse('1')
             logger.info("check status for job: " + job_id)
             job_obj = NNJobHistory.objects.get(job_id=job_id)
-            if job_obj.job_status == 'SUCCEED':
-                return HttpResponse('1')
-            else:
+            if job_obj.job_status == 'RUNNING':
                 return HttpResponse('0')
+            else:
+                return HttpResponse('1')
 
     return render(request, 'operations.html')

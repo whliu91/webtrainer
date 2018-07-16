@@ -1,28 +1,32 @@
 {
-  "_from": "iview",
+  "_args": [
+    [
+      "iview@2.14.3",
+      "E:\\work\\web\\webtrainer\\webtrainer\\src\\django\\webtrainer"
+    ]
+  ],
+  "_from": "iview@2.14.3",
   "_id": "iview@2.14.3",
   "_inBundle": false,
   "_integrity": "sha512-jK5CBNuNBKUZWooCVlipBIUkNnGeZHRtypeuMo9VhQmJ9cCXmuI6BalrtxBFkBCnuUXRdFD34/kSevF9Cc2kpg==",
   "_location": "/iview",
   "_phantomChildren": {},
   "_requested": {
-    "type": "tag",
+    "type": "version",
     "registry": true,
-    "raw": "iview",
+    "raw": "iview@2.14.3",
     "name": "iview",
     "escapedName": "iview",
-    "rawSpec": "",
+    "rawSpec": "2.14.3",
     "saveSpec": null,
-    "fetchSpec": "latest"
+    "fetchSpec": "2.14.3"
   },
   "_requiredBy": [
-    "#USER",
     "/"
   ],
   "_resolved": "https://registry.npmjs.org/iview/-/iview-2.14.3.tgz",
-  "_shasum": "0f32a450f956cce2ac60a4df5a6eba30816a0708",
-  "_spec": "iview",
-  "_where": "C:\\Users\\d891834\\Projects\\temp\\webtrainer\\src\\com\\django\\django\\webtrainer",
+  "_spec": "2.14.3",
+  "_where": "E:\\work\\web\\webtrainer\\webtrainer\\src\\django\\webtrainer",
   "author": {
     "name": "Aresn"
   },
@@ -38,7 +42,6 @@
   "bugs": {
     "url": "https://github.com/iview/iview/issues"
   },
-  "bundleDependencies": false,
   "dependencies": {
     "async-validator": "^1.8.2",
     "deepmerge": "^2.1.0",
@@ -49,7 +52,6 @@
     "tinycolor2": "^1.4.1",
     "v-click-outside-x": "^3.0.0"
   },
-  "deprecated": false,
   "description": "A high quality UI components Library with Vue.js",
   "devDependencies": {
     "autoprefixer-loader": "^3.2.0",
