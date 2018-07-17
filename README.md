@@ -13,7 +13,7 @@ For developers who is working on or want to contribute to the project. The web a
 |python|https://www.python.org/downloads/release/python-365/|python 3.6.5|
 |MySQL|https://dev.mysql.com/downloads/mysql/5.7.html#downloads|database for project (changable)|
 |RabbitMQ|https://www.rabbitmq.com/download.html|async message broker (changable)|
-|NPM|https://www.npmjs.com/|js package manager (optional)|
+|NPM|https://www.npmjs.com/|js package manager|
 
 *When installing MySQL, select full-install, and you will be prompted to create a root user's account, do remember the credentials which will be required in the django `SETTINGS.py`
 
@@ -62,6 +62,17 @@ $ python manage.py makemigrations
 $ python manage.py migrate
 ```
 
+- install frontend packages via NPM  <br />
+The required packages used in this project is listed (and tracked) in package.json, after you have npm installed,
+just run in the root folder of the django project:
+```sh
+$ npm init
+```
+And specified project related params. Then, run:
+```sh
+$ python manage.py collectstatic
+```
+
 - start server and test!  <br />
 The easiest way to test the application is to run the server using django built-in server.
 
@@ -80,8 +91,7 @@ $ python manage.py collectstatic
 ```
 to copy them into django's static file folder
 * Note: 
-1. the basic packages are already in the static folder and tracked on git, do above only when you are trying to add more javascript packages.
-2. static folder /static/ is where python collectstatic will end up with, for customized static files, please put in /projstatic/ folder.
+1. static folder /static/ is where python collectstatic will end up with, for customized static files, please put in /projstatic/ folder.
 
 *BootStrap 4.2.0* <br />
 *Vue.js 2.0* <br />
